@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, Check, Sparkles, Crown, Star, Palette, User, Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, API_URL } from "@/lib/utils";
 
 interface AvatarCustomization {
   avatar_skin: string;
@@ -841,7 +841,7 @@ const ProfileCustomization = ({ tier }: ProfileCustomizationProps) => {
     if (!session) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/profiles/customization', {
+      const response = await fetch(`${API_URL}/profiles/customization`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -867,7 +867,7 @@ const ProfileCustomization = ({ tier }: ProfileCustomizationProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const response = await fetch('http://localhost:3001/api/profiles/customization', {
+      const response = await fetch(`${API_URL}/profiles/customization`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

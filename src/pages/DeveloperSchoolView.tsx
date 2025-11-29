@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,7 @@ const DeveloperSchoolView = () => {
 
     try {
       // Load school details
-      const response = await fetch(`http://localhost:3001/api/schools/${schoolId}`, {
+      const response = await fetch(`${API_URL}/schools/${schoolId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -66,7 +67,7 @@ const DeveloperSchoolView = () => {
     if (!schoolId) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/classes?school_id=${schoolId}`, {
+      const response = await fetch(`${API_URL}/classes?school_id=${schoolId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -97,7 +98,7 @@ const DeveloperSchoolView = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/schools/${schoolId}`, {
+      const response = await fetch(`${API_URL}/schools/${schoolId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +140,7 @@ const DeveloperSchoolView = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/classes/${renameClassId}`, {
+      const response = await fetch(`${API_URL}/classes/${renameClassId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -177,7 +178,7 @@ const DeveloperSchoolView = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/classes/${deleteClassId}`, {
+      const response = await fetch(`${API_URL}/classes/${deleteClassId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -217,7 +218,7 @@ const DeveloperSchoolView = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/schools/${schoolId}`, {
+      const response = await fetch(`${API_URL}/schools/${schoolId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

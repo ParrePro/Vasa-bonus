@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTierFavicon } from "@/hooks/use-tier-favicon";
@@ -69,7 +70,7 @@ const TeacherDashboard = () => {
 
   const loadClasses = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/classes", {
+      const response = await fetch(`${API_URL}/classes`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ const CreateClassView = () => {
       if (!token) throw new Error("Not authenticated");
 
       // Generate class code
-      const codeResponse = await fetch('http://localhost:3001/api/classes/generate-code', {
+      const codeResponse = await fetch(`${API_URL}/classes/generate-code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ const CreateClassView = () => {
       }
 
       // Create the class
-      const createResponse = await fetch('http://localhost:3001/api/classes', {
+      const createResponse = await fetch(`${API_URL}/classes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

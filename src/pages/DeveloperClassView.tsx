@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -83,7 +84,7 @@ const DeveloperClassView = () => {
       if (!session) throw new Error("Not authenticated");
 
       // Use backend API to add points (this will also award tier points)
-      const response = await fetch('http://localhost:3001/api/points', {
+      const response = await fetch(`${API_URL}/points`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

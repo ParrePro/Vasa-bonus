@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ const AccountSettings = ({ userRole, classes = [], onClassDeleted, tier = 'basic
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/api/auth/delete-account", {
+      const response = await fetch(`${API_URL}/auth/delete-account`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +88,7 @@ const AccountSettings = ({ userRole, classes = [], onClassDeleted, tier = 'basic
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/classes/${deleteClassId}`, {
+      const response = await fetch(`${API_URL}/classes/${deleteClassId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

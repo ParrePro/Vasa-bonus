@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,7 @@ const DeveloperDashboard = () => {
     if (!session) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/me', {
+      const response = await fetch(`${API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -72,7 +73,7 @@ const DeveloperDashboard = () => {
 
   const loadSchools = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/schools', {
+      const response = await fetch(`${API_URL}/schools`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -96,7 +97,7 @@ const DeveloperDashboard = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
 
-      const response = await fetch('http://localhost:3001/api/schools', {
+      const response = await fetch(`${API_URL}/schools`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

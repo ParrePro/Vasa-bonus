@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
+import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -43,7 +44,7 @@ const RewardsView = ({ classId, studentPoints, onPurchase }: RewardsViewProps) =
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const response = await fetch(`http://localhost:3001/api/gifts/classmates/${classId}`, {
+      const response = await fetch(`${API_URL}/gifts/classmates/${classId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -183,7 +184,7 @@ const RewardsView = ({ classId, studentPoints, onPurchase }: RewardsViewProps) =
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const response = await fetch('http://localhost:3001/api/gifts/reward', {
+      const response = await fetch(`${API_URL}/gifts/reward`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

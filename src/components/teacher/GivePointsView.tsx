@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { API_URL } from "@/lib/utils";
 
 const GivePointsView = () => {
   const [classes, setClasses] = useState<any[]>([]);
@@ -17,7 +18,7 @@ const GivePointsView = () => {
       const token = localStorage.getItem('auth_token');
       if (!token) return;
 
-      const response = await fetch('http://localhost:3001/api/classes', {
+      const response = await fetch(`${API_URL}/classes`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
