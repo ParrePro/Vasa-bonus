@@ -218,6 +218,7 @@ router.patch('/:table', authMiddleware, async (req: AuthRequest, res) => {
       'campaign_classes',
       'campaign_participations',
       'messages',
+      'profiles',
     ];
 
     if (!allowedTables.includes(table)) {
