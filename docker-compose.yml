@@ -34,10 +34,10 @@ services:
       PORT: 3001
       NODE_ENV: development
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      CORS_ORIGIN: http://localhost:5173,http://localhost:3000
+      CORS_ORIGIN: http://localhost:5173,http://localhost:3000,http://localhost:8080,http://192.168.50.32:8080,http://192.168.50.32:5173
       GMAIL_USER: Vasabonusinfo@gmail.com
       GMAIL_APP_PASSWORD: "sbdx qmtd ryui asju"
-      FRONTEND_URL: http://localhost:8080
+      FRONTEND_URL: http://192.168.50.32:8080
     ports:
       - "3001:3001"
     volumes:
