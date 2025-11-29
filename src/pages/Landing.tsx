@@ -169,7 +169,7 @@ const Landing = () => {
             Why we built VasaBonus
           </h2>
           <p className="text-lg text-gray-600 mb-6">
-            VasaBonus started as a community project at our school, Vasaskolan in Gävle, Sweden. 
+            VasaBonus started as a community project at our school, Vasa International School of Stockholm. 
             We wanted to find a fun and engaging way to spread kindness throughout our school community.
           </p>
           <p className="text-lg text-gray-600 mb-6">
@@ -214,6 +214,19 @@ const Landing = () => {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
+              {/* Parth */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-white">P</span>
+                </div>
+                <h3 className="text-2xl font-bold text-center mb-4">Parth</h3>
+                <p className="text-gray-600 text-center">
+                  Parth combines his love for programming with his passion for badminton. 
+                  A dedicated athlete and coder, he enjoys teaching programming to younger 
+                  students and helping them discover the joy of building things with code.
+                </p>
+              </div>
+
               {/* Nils */}
               <div className="bg-white rounded-2xl p-8 shadow-lg">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mx-auto mb-6">
@@ -225,19 +238,6 @@ const Landing = () => {
                   you can find him doing photo editing and working on visual projects. 
                   He loves teaching programming to younger students and inspiring the next 
                   generation of developers.
-                </p>
-              </div>
-
-              {/* Parth */}
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl font-bold text-white">P</span>
-                </div>
-                <h3 className="text-2xl font-bold text-center mb-4">Parth</h3>
-                <p className="text-gray-600 text-center">
-                  Parth combines his love for programming with his passion for badminton. 
-                  A dedicated athlete and coder, he enjoys teaching programming to younger 
-                  students and helping them discover the joy of building things with code.
                 </p>
               </div>
             </div>
@@ -288,7 +288,7 @@ const Landing = () => {
             </div>
             <div className="text-center md:text-right">
               <p className="text-sm">
-                Created by students at Vasaskolan Gävle
+                Created by students at Vasa International School of Stockholm
               </p>
               <p className="text-sm mt-1">
                 © {new Date().getFullYear()} VasaBonus. All rights reserved.
