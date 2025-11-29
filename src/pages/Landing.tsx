@@ -20,10 +20,10 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex gap-4">
-            <Button variant="ghost" onClick={() => navigate("/auth")}>
+            <Button variant="ghost" onClick={() => navigate("/auth?mode=login")}>
               Log in
             </Button>
-            <Button onClick={() => navigate("/auth")} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+            <Button onClick={() => navigate("/auth?mode=signup")} className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
               Get started
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -51,7 +51,7 @@ const Landing = () => {
           <div className="flex gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/auth?mode=signup")}
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-lg px-8 py-6"
             >
               Create free account
@@ -60,7 +60,7 @@ const Landing = () => {
             <Button 
               size="lg" 
               variant="outline"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/auth?mode=login")}
               className="text-lg px-8 py-6"
             >
               Log in
@@ -267,7 +267,7 @@ const Landing = () => {
           </p>
           <Button 
             size="lg" 
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate("/auth?mode=signup")}
             className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-lg px-10 py-6"
           >
             Create free account
