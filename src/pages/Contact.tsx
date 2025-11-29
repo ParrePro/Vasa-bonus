@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { API_URL } from "@/lib/utils";
 import { Sparkles, ArrowLeft, School, Mail, User, MessageSquare } from "lucide-react";
 
 const Contact = () => {
@@ -22,7 +23,7 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(`${API_URL}/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
