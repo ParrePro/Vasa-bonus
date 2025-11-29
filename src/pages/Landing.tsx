@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Award, Gift, Users, Zap, Shield, Heart, ArrowRight, Sparkles } from "lucide-react";
+import { Star, Award, Gift, Users, Zap, Shield, Heart, ArrowRight, Sparkles, School } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -20,6 +20,10 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex gap-4">
+            <Button variant="outline" onClick={() => navigate("/contact")}>
+              <School className="w-4 h-4 mr-2" />
+              Implement at School
+            </Button>
             <Button variant="ghost" onClick={() => navigate("/auth?mode=login")}>
               Log in
             </Button>

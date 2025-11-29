@@ -12,6 +12,7 @@ import storageRoutes from './routes/storage';
 import functionsRoutes from './routes/functions';
 import giftsRoutes from './routes/gifts';
 import profilesRoutes from './routes/profiles';
+import contactRoutes from './routes/contact';
 import { startReminderScheduler } from './scheduler';
 
 dotenv.config();
@@ -45,6 +46,7 @@ app.use('/api/storage', storageRoutes);
 app.use('/api/functions', functionsRoutes);
 app.use('/api/gifts', giftsRoutes);
 app.use('/api/profiles', profilesRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
