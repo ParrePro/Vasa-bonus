@@ -162,6 +162,100 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Why We Built This */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Why we built VasaBonus
+          </h2>
+          <p className="text-lg text-gray-600 mb-6">
+            VasaBonus started as a community project at our school, Vasaskolan in Gävle, Sweden. 
+            We wanted to find a fun and engaging way to spread kindness throughout our school community.
+          </p>
+          <p className="text-lg text-gray-600 mb-6">
+            We believe that positive reinforcement can transform the classroom experience. By gamifying 
+            good behavior, helpfulness, and academic achievements, we created a system where students 
+            are motivated to support each other and strive for their best. It's not just about collecting 
+            points — it's about building a culture of kindness, recognition, and encouragement.
+          </p>
+          <p className="text-lg text-gray-600">
+            What started as a simple idea has grown into a tool that teachers and students love using 
+            every day. We hope VasaBonus can help your classroom become a more positive and engaging 
+            place for everyone!
+          </p>
+        </div>
+      </section>
+
+      {/* About Us */}
+      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Meet the Team
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Two friends with a passion for coding and making a difference
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            {/* Team Photo */}
+            <div className="mb-12 flex justify-center">
+              <div className="rounded-2xl overflow-hidden shadow-xl">
+                <img 
+                  src="/team-photo.jpg" 
+                  alt="Nils and Parth at FIRST Global in Panama City" 
+                  className="w-full max-w-2xl object-cover"
+                />
+                <div className="bg-white p-4 text-center">
+                  <p className="text-sm text-gray-600">Team Sweden Robotics at FIRST Global 2024, Panama City</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Nils */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-white">N</span>
+                </div>
+                <h3 className="text-2xl font-bold text-center mb-4">Nils</h3>
+                <p className="text-gray-600 text-center">
+                  Nils is passionate about technology and creativity. When he's not coding, 
+                  you can find him doing photo editing and working on visual projects. 
+                  He loves teaching programming to younger students and inspiring the next 
+                  generation of developers.
+                </p>
+              </div>
+
+              {/* Parth */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-white">P</span>
+                </div>
+                <h3 className="text-2xl font-bold text-center mb-4">Parth</h3>
+                <p className="text-gray-600 text-center">
+                  Parth combines his love for programming with his passion for badminton. 
+                  A dedicated athlete and coder, he enjoys teaching programming to younger 
+                  students and helping them discover the joy of building things with code.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-12 text-center">
+              <div className="inline-flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-md">
+                <Heart className="w-6 h-6 text-red-500" />
+                <p className="text-gray-700">
+                  <span className="font-semibold">Friends since first grade</span> — We've been 
+                  building projects together for years, including competing at <span className="font-semibold">FIRST Global</span>, 
+                  an international robotics competition in Panama City.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-20 text-center">
         <div className="max-w-3xl mx-auto">
