@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: school_star_points_db
+    environment:
+      POSTGRES_USER: school_user
+      POSTGRES_PASSWORD: school_password_local
+      POSTGRES_DB: school_star_points_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U school_user -d school_star_points_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - school-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school_star_points_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://school_user:school_password_local@postgres:5432/school_star_points_dev
+      PORT: 3001
+      NODE_ENV: development
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      CORS_ORIGIN: http://localhost:5173,http://localhost:3000
+      GMAIL_USER: Vasabonusinfo@gmail.com
+      GMAIL_APP_PASSWORD: "sbdx qmtd ryui asju"
+      FRONTEND_URL: http://localhost:8080
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/src:/app/server/src
+      - uploads_data:/app/server/uploads
+    networks:
+      - school-network
+    command: npm run dev
+
+networks:
+  school-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads_data:

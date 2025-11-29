@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+server/node_modules
+
+# Build outputs
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment files (keep .env.example but ignore actual .env)
+.env
+.env.local
+.env.*.local
+
+# Docker volumes and data (database data is NOT pushed)
+postgres_data/
+data/
+
+# Supabase local
+.supabase/
+
+# Lock files can optionally be included, keeping them for consistency
+# bun.lockb
