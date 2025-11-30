@@ -14,6 +14,7 @@ import DeveloperDashboard from "./pages/DeveloperDashboard";
 import DeveloperSchoolView from "./pages/DeveloperSchoolView";
 import DeveloperClassView from "./pages/DeveloperClassView";
 import Contact from "./pages/Contact";
+import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/developer/school/:schoolId" element={<DeveloperSchoolView />} />
           <Route path="/developer/class/:classId" element={<DeveloperClassView />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

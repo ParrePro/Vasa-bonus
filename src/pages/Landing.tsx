@@ -20,6 +20,9 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex gap-4">
+            <Button variant="ghost" onClick={() => navigate("/how-it-works")}>
+              How It Works
+            </Button>
             <Button variant="outline" onClick={() => navigate("/contact")}>
               <School className="w-4 h-4 mr-2" />
               Implement at School
@@ -79,9 +82,17 @@ const Landing = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             How does it work?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
             A simple system that motivates students and makes the classroom more fun
           </p>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/how-it-works")}
+            className="text-purple-600 border-purple-300 hover:bg-purple-50"
+          >
+            View complete guide
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
