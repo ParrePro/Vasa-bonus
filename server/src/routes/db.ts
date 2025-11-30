@@ -280,6 +280,10 @@ router.delete('/:table', authMiddleware, async (req: AuthRequest, res) => {
       'rewards',
       'reward_classes',
       'reward_purchases',
+      'class_members',
+      'points_transactions',
+      'user_roles',
+      'profiles',
     ];
 
     if (!allowedTables.includes(table)) {
