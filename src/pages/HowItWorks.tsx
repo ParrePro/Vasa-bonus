@@ -16,9 +16,7 @@ const HowItWorks = () => {
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
+            <img src="/favicon.png" alt="VasaBonus" className="w-10 h-10" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               VasaBonus
             </span>
@@ -65,9 +63,7 @@ const HowItWorks = () => {
       <section className="container mx-auto px-6 py-12">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-              <School className="w-6 h-6 text-white" />
-            </div>
+            <img src="/favicon-teacher.png" alt="Teacher" className="w-12 h-12" />
             <h2 className="text-3xl font-bold text-gray-900">For Teachers</h2>
           </div>
 
@@ -181,11 +177,11 @@ const HowItWorks = () => {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <h4 className="font-semibold mb-2">Reward Ideas:</h4>
                         <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• Homework pass (100 points)</li>
-                          <li>• Extra credit (75 points)</li>
-                          <li>• Choose your seat (50 points)</li>
-                          <li>• Music during work (30 points)</li>
-                          <li>• Lunch with teacher (200 points)</li>
+                          <li>• Homework pass</li>
+                          <li>• Choose your seat</li>
+                          <li>• Fast track to lunch</li>
+                          <li>• Free snack from teacher</li>
+                          <li>• Extra break time</li>
                         </ul>
                       </div>
                       <div className="bg-green-50 rounded-lg p-4">
@@ -232,9 +228,7 @@ const HowItWorks = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
-              </div>
+              <img src="/favicon.png" alt="Student" className="w-12 h-12" />
               <h2 className="text-3xl font-bold text-white">For Students</h2>
             </div>
 
@@ -298,22 +292,22 @@ const HowItWorks = () => {
                       <div className="bg-gradient-to-br from-gray-400/20 to-gray-600/20 rounded-lg p-3 text-center">
                         <Shield className="w-6 h-6 text-gray-300 mx-auto mb-1" />
                         <p className="text-white font-semibold text-sm">Basic</p>
-                        <p className="text-purple-300 text-xs">0+ pts</p>
+                        <p className="text-purple-300 text-xs">0 tier pts</p>
                       </div>
                       <div className="bg-gradient-to-br from-gray-300/20 to-gray-400/20 rounded-lg p-3 text-center">
                         <Shield className="w-6 h-6 text-gray-200 mx-auto mb-1" />
                         <p className="text-white font-semibold text-sm">Silver</p>
-                        <p className="text-purple-300 text-xs">50+ pts</p>
+                        <p className="text-purple-300 text-xs">50 tier pts</p>
                       </div>
                       <div className="bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-lg p-3 text-center">
                         <Shield className="w-6 h-6 text-yellow-300 mx-auto mb-1" />
                         <p className="text-white font-semibold text-sm">Gold</p>
-                        <p className="text-purple-300 text-xs">200+ pts</p>
+                        <p className="text-purple-300 text-xs">100 tier pts</p>
                       </div>
                       <div className="bg-gradient-to-br from-red-400/20 to-red-600/20 rounded-lg p-3 text-center">
                         <Shield className="w-6 h-6 text-red-300 mx-auto mb-1" />
                         <p className="text-white font-semibold text-sm">Ruby</p>
-                        <p className="text-purple-300 text-xs">500+ pts</p>
+                        <p className="text-purple-300 text-xs">200 tier pts</p>
                       </div>
                     </div>
                   </div>
@@ -396,7 +390,7 @@ const HowItWorks = () => {
             <Card className="border-0 shadow-md">
               <CardContent className="p-6">
                 <h3 className="font-bold text-lg mb-2">Can students see each other's points?</h3>
-                <p className="text-gray-600">Students can see a class ranking, but the exact points of other students may be limited depending on how the class is set up.</p>
+                <p className="text-gray-600">No, students can only see their own points. Each student's points are private to them.</p>
               </CardContent>
             </Card>
 
@@ -411,13 +405,6 @@ const HowItWorks = () => {
               <CardContent className="p-6">
                 <h3 className="font-bold text-lg mb-2">What happens when a student buys a reward?</h3>
                 <p className="text-gray-600">When a student purchases a reward, the teacher gets a notification in their "Pending Rewards" section. The teacher can then fulfill the reward and mark it as complete.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-2">Can points be taken away?</h3>
-                <p className="text-gray-600">Yes, teachers can also remove points if needed, with a reason for the deduction.</p>
               </CardContent>
             </Card>
           </div>
@@ -462,9 +449,7 @@ const HowItWorks = () => {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center gap-2 mb-4 md:mb-0 cursor-pointer" onClick={() => navigate("/")}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
+              <img src="/favicon.png" alt="VasaBonus" className="w-8 h-8" />
               <span className="text-xl font-bold text-white">VasaBonus</span>
             </div>
             <div className="text-center md:text-right">

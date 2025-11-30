@@ -67,9 +67,7 @@ const Contact = () => {
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
+            <img src="/favicon.png" alt="VasaBonus" className="w-10 h-10" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               VasaBonus
             </span>
