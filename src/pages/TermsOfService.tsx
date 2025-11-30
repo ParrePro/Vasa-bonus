@@ -222,7 +222,7 @@ const TermsOfService = () => {
                   If you have questions about these Terms of Service, contact us:
                 </p>
                 <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-                  <p className="text-gray-700"><strong>Email:</strong> support@vasabonus.se</p>
+                  <p className="text-gray-700"><strong>Email:</strong> vasabonusinfo@gmail.com</p>
                   <p className="text-gray-700"><strong>Website:</strong> vasabonus.se/contact</p>
                 </div>
               </section>

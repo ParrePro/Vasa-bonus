@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
                   VasaBonus is the data controller for the personal data collected through this platform.
                 </p>
                 <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-                  <p className="text-gray-700"><strong>Contact:</strong> privacy@vasabonus.se</p>
+                  <p className="text-gray-700"><strong>Contact:</strong> vasabonusinfo@gmail.com</p>
                   <p className="text-gray-700"><strong>Location:</strong> Stockholm, Sweden</p>
                 </div>
               </section>
@@ -193,7 +193,7 @@ const PrivacyPolicy = () => {
                   </div>
                 </div>
                 <p className="text-gray-700 leading-relaxed mt-4">
-                  To exercise these rights, contact us at <strong>privacy@vasabonus.se</strong> or use the 
+                  To exercise these rights, contact us at <strong>vasabonusinfo@gmail.com</strong> or use the 
                   account settings in your dashboard.
                 </p>
               </section>
@@ -243,7 +243,7 @@ const PrivacyPolicy = () => {
                   If you have questions about this Privacy Policy or wish to exercise your rights, contact us:
                 </p>
                 <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-                  <p className="text-gray-700"><strong>Email:</strong> privacy@vasabonus.se</p>
+                  <p className="text-gray-700"><strong>Email:</strong> vasabonusinfo@gmail.com</p>
                   <p className="text-gray-700 mt-2">
                     You also have the right to lodge a complaint with the Swedish Authority for Privacy 
                     Protection (IMY) at <a href="https://www.imy.se" className="text-purple-600 hover:underline" target="_blank" rel="noopener noreferrer">www.imy.se</a>.
