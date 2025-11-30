@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/utils";
 import { Sparkles, ArrowLeft, School, Mail, User, MessageSquare } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Contact = () => {
   const [schoolName, setSchoolName] = useState("");
@@ -63,6 +64,12 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <SEO 
+        title="Implement VasaBonus at Your School - Contact Us"
+        description="Want to use VasaBonus at your school? Contact us to get started with our free classroom reward system. We'll help you set up and get your teachers and students onboarded."
+        keywords="implement VasaBonus, school contact, classroom rewards for schools, education technology"
+        canonical="https://vasabonus.se/contact"
+      />
       {/* Header */}
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">

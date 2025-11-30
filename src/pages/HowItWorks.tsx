@@ -6,12 +6,19 @@ import {
   School, UserPlus, LogIn, Trophy, ShoppingBag, TrendingUp, Settings,
   CheckCircle, BookOpen, Target, Palette
 } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const HowItWorks = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <SEO 
+        title="How VasaBonus Works - Complete Guide for Teachers & Students"
+        description="Learn how to use VasaBonus: Teachers create classes, give points for good behavior, and set up rewards. Students earn points, level up through tiers, and redeem rewards."
+        keywords="how to use VasaBonus, classroom rewards guide, teacher tutorial, student guide, school points system tutorial"
+        canonical="https://vasabonus.se/how-it-works"
+      />
       {/* Header */}
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">

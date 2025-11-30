@@ -2,12 +2,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Award, Gift, Users, Zap, Shield, Heart, ArrowRight, Sparkles, School } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Landing = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <SEO 
+        title="VasaBonus - Motivate Students with Points & Rewards | Free School Reward System"
+        description="VasaBonus makes it easy for teachers to give points to students for good behavior and achievements. Students can redeem points for rewards in the class store. Free for all schools!"
+        keywords="classroom rewards, student points, school reward system, teacher tools, student motivation, classroom management, education app, points system"
+        canonical="https://vasabonus.se"
+      />
       {/* Header */}
       <header className="container mx-auto px-6 py-6">
         <nav className="flex items-center justify-between">
