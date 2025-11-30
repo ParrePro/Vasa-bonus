@@ -299,10 +299,16 @@ const Landing = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
               <img src="/favicon.png" alt="VasaBonus" className="w-8 h-8" />
               <span className="text-xl font-bold text-white">VasaBonus</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <a href="/how-it-works" className="hover:text-white transition-colors">How It Works</a>
+              <a href="/contact" className="hover:text-white transition-colors">Contact</a>
+              <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
             </div>
             <div className="text-center md:text-right">
               <p className="text-sm">
