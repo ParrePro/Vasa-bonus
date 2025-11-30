@@ -45,6 +45,10 @@
     <meta name="theme-color" content="#8B5CF6" />
     <meta name="msapplication-TileColor" content="#8B5CF6" />
     <meta name="msapplication-TileImage" content="/favicon.png" />
+    <meta name="geo.region" content="SE" />
+    <meta name="geo.placename" content="Stockholm" />
+    <meta name="geo.position" content="59.3293;18.0686" />
+    <meta name="ICBM" content="59.3293, 18.0686" />
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -56,15 +60,21 @@
       "url": "https://vasabonus.se",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Web Browser",
+      "inLanguage": ["en", "sv"],
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "SEK"
       },
       "author": {
         "@type": "Organization",
         "name": "VasaBonus Team",
-        "description": "Created by students at Vasa International School of Stockholm"
+        "description": "Created by students at Vasa International School of Stockholm",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Stockholm",
+          "addressCountry": "SE"
+        }
       },
       "audience": {
         "@type": "EducationalAudience",
