@@ -178,6 +178,11 @@ CREATE TABLE IF NOT EXISTS reward_purchases (
   expires_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Add missing columns if they don't exist (for existing databases)
+ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS gifted_by UUID REFERENCES auth_users(id) ON DELETE SET NULL;
+ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS gifted_by_name TEXT;
+ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+
 -- Create messages table for teacher notifications
 CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
