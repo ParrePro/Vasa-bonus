@@ -172,7 +172,10 @@ CREATE TABLE IF NOT EXISTS reward_purchases (
   purchased_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   fulfilled_at TIMESTAMP WITH TIME ZONE,
   fulfilled_by UUID REFERENCES auth_users(id) ON DELETE SET NULL,
-  status TEXT DEFAULT 'pending'
+  status TEXT DEFAULT 'pending',
+  gifted_by UUID REFERENCES auth_users(id) ON DELETE SET NULL,
+  gifted_by_name TEXT,
+  expires_at TIMESTAMP WITH TIME ZONE
 );
 
 -- Create messages table for teacher notifications
