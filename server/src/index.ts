@@ -14,6 +14,7 @@ import giftsRoutes from './routes/gifts';
 import profilesRoutes from './routes/profiles';
 import contactRoutes from './routes/contact';
 import { startReminderScheduler } from './scheduler';
+import { runMigrations } from './migrations';
 
 dotenv.config();
 
@@ -53,8 +54,16 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
+  
+  // Run migrations on startup
+  try {
+    await runMigrations();
+  } catch (error) {
+    console.error('Failed to run migrations:', error);
+    process.exit(1);
+  }
   
   // Start the reminder scheduler for follow-up emails
   startReminderScheduler();
