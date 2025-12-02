@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import authBg from "@/assets/auth-background.jpg";
-import { Sparkles } from "lucide-react";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -85,8 +84,8 @@ const Auth = () => {
       
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-2 border-primary/20 backdrop-blur-md bg-card/95">
         <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg animate-pulse">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+            <img src="/favicon.png" alt="VasaBonus" className="w-10 h-10" />
           </div>
           <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             VasaBonus
