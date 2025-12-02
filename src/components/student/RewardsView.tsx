@@ -156,12 +156,16 @@ const RewardsView = ({ classId, studentPoints, onPurchase }: RewardsViewProps) =
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to purchase reward');
       }
 
       toast({ title: "Reward purchased successfully!" });
-      onPurchase();
+      
+      // Add a small delay and then refresh to ensure database is updated
+      setTimeout(() => {
+        onPurchase();
+      }, 500);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Please try again";
       toast({
