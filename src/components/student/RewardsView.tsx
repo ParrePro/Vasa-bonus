@@ -135,32 +135,40 @@ const RewardsView = ({ classId, studentPoints, onPurchase }: RewardsViewProps) =
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
     try {
       setPurchasingId(reward.id);
 
-      // Call edge function to handle purchase securely
-      const { data, error } = await supabase.functions.invoke("purchase-reward", {
-        body: {
+      // Call local API endpoint to handle purchase
+      const response = await fetch(`${API_URL}/functions/purchase-reward`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
           rewardId: reward.id,
           classId: classId,
-        },
+        }),
       });
 
-      if (error || !data?.success) {
-        const description = (data as any)?.error || error?.message || "Please try again";
-        toast({
-          title: "Error purchasing reward",
-          description,
-          variant: "destructive",
-        });
-        return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to purchase reward');
       }
 
       toast({ title: "Reward purchased successfully!" });
       onPurchase();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Please try again";
+      toast({
+        title: "Error purchasing reward",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setPurchasingId(null);
     }
