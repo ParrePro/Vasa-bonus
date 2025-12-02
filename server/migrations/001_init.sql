@@ -18,7 +18,17 @@ CREATE TABLE IF NOT EXISTS auth_users (
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth_users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  current_tier TEXT DEFAULT 'basic',
+  tier_points INTEGER DEFAULT 0,
+  avatar_skin TEXT DEFAULT 'fair',
+  avatar_hair TEXT DEFAULT 'short',
+  avatar_hair_color TEXT DEFAULT 'black',
+  avatar_eyes TEXT DEFAULT 'normal',
+  avatar_accessory TEXT DEFAULT 'none',
+  avatar_background TEXT DEFAULT 'cream',
+  avatar_border TEXT DEFAULT 'none',
+  avatar_effect TEXT DEFAULT 'none'
 );
 
 -- Create app role enum
@@ -60,6 +70,12 @@ CREATE TABLE IF NOT EXISTS class_members (
   user_id UUID REFERENCES auth_users(id) ON DELETE CASCADE NOT NULL,
   is_teacher BOOLEAN DEFAULT FALSE,
   joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  can_give_points BOOLEAN DEFAULT false,
+  can_add_rewards BOOLEAN DEFAULT false,
+  can_add_campaigns BOOLEAN DEFAULT false,
+  can_fulfill_rewards BOOLEAN DEFAULT false,
+  can_fulfill_campaigns BOOLEAN DEFAULT false,
+  can_remove_students BOOLEAN DEFAULT false,
   UNIQUE(class_id, user_id)
 );
 
@@ -182,6 +198,26 @@ CREATE TABLE IF NOT EXISTS reward_purchases (
 ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS gifted_by UUID REFERENCES auth_users(id) ON DELETE SET NULL;
 ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS gifted_by_name TEXT;
 ALTER TABLE reward_purchases ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+
+-- Add avatar and tier columns to profiles if they don't exist (for existing databases)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS current_tier TEXT DEFAULT 'basic';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS tier_points INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_skin TEXT DEFAULT 'fair';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_hair TEXT DEFAULT 'short';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_hair_color TEXT DEFAULT 'black';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_eyes TEXT DEFAULT 'normal';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_accessory TEXT DEFAULT 'none';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_background TEXT DEFAULT 'cream';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_border TEXT DEFAULT 'none';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_effect TEXT DEFAULT 'none';
+
+-- Add permission columns to class_members if they don't exist (for existing databases)
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_give_points BOOLEAN DEFAULT false;
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_add_rewards BOOLEAN DEFAULT false;
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_add_campaigns BOOLEAN DEFAULT false;
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_fulfill_rewards BOOLEAN DEFAULT false;
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_fulfill_campaigns BOOLEAN DEFAULT false;
+ALTER TABLE class_members ADD COLUMN IF NOT EXISTS can_remove_students BOOLEAN DEFAULT false;
 
 -- Create messages table for teacher notifications
 CREATE TABLE IF NOT EXISTS messages (
