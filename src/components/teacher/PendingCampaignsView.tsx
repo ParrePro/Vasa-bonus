@@ -279,7 +279,7 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   {participation.campaign.description}
