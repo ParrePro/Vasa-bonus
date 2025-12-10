@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Zap, Trophy } from "lucide-react";
+import { Check, Zap, Trophy, X } from "lucide-react";
 
 interface PendingCampaignsViewProps {
   classId: string;
@@ -194,6 +194,65 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
     }
   };
 
+  const handleReject = async (participationId: string) => {
+    if (!canFulfillCampaigns) {
+      toast({
+        title: "Permission Denied",
+        description: "You don't have permission to reject campaign participations",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to reject campaigns",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/functions/reject-campaign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          participationId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to reject participation",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Campaign participation rejected",
+      });
+
+      loadPendingParticipations();
+    } catch (error) {
+      console.error('Error rejecting participation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reject participation",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (pendingParticipations.length === 0) {
     return (
       <div className="text-center py-12">
@@ -239,16 +298,25 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
                 )}
               </div>
               {canFulfillCampaigns && (
-                <Button
-                  onClick={() => handleConfirm(
-                    participation.id, 
-                    participation.campaign.campaign_type,
-                    participation.campaign.points_value
-                  )}
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Confirm
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleConfirm(
+                      participation.id, 
+                      participation.campaign.campaign_type,
+                      participation.campaign.points_value
+                    )}
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Confirm
+                  </Button>
+                  <Button
+                    onClick={() => handleReject(participation.id)}
+                    variant="destructive"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Reject
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>

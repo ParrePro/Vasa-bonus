@@ -440,4 +440,128 @@ router.post('/confirm-campaign', authMiddleware, async (req: AuthRequest, res) =
   }
 });
 
+// Reject reward purchase - returns points to student
+router.post('/reject-reward', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    const { purchaseId } = req.body;
+
+    if (!userId || !purchaseId) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    // Get the reward purchase
+    const purchaseResult = await query(
+      'SELECT * FROM reward_purchases WHERE id = $1',
+      [purchaseId]
+    );
+
+    if (purchaseResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Reward purchase not found' });
+    }
+
+    const purchase = purchaseResult.rows[0];
+    const { class_id: classId, status, student_id: studentId, reward_id: rewardId } = purchase;
+
+    if (status !== 'pending') {
+      return res.status(400).json({ success: false, error: 'Reward is not pending' });
+    }
+
+    // Check permission
+    const hasPermission = await checkTeacherPermission(userId, classId, 'can_fulfill_rewards');
+    if (!hasPermission) {
+      return res.status(403).json({ success: false, error: 'You do not have permission to reject rewards' });
+    }
+
+    // Get reward details to know how many points to refund
+    const rewardResult = await query(
+      'SELECT * FROM rewards WHERE id = $1',
+      [rewardId]
+    );
+
+    if (rewardResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Reward not found' });
+    }
+
+    const reward = rewardResult.rows[0];
+
+    // Refund points to student
+    await query(
+      'INSERT INTO points_transactions (student_id, teacher_id, class_id, points, reason) VALUES ($1, $2, $3, $4, $5)',
+      [studentId, userId, classId, reward.points_cost, `Reward rejected: ${reward.title}`]
+    );
+
+    // Update the reward purchase status to rejected
+    await query(
+      `UPDATE reward_purchases SET status = 'rejected', fulfilled_at = NOW(), fulfilled_by = $1 WHERE id = $2`,
+      [userId, purchaseId]
+    );
+
+    // Mark related messages as read
+    await query(
+      'UPDATE messages SET is_read = true WHERE reward_purchase_id = $1',
+      [purchaseId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Reject reward error:', error);
+    res.status(500).json({ success: false, error: 'Failed to reject reward' });
+  }
+});
+
+// Reject campaign participation - just marks as rejected, no points involved
+router.post('/reject-campaign', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    const { participationId } = req.body;
+
+    if (!userId || !participationId) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    // Get the participation
+    const participationResult = await query(
+      `SELECT cp.class_id, cp.status, cp.campaign_id
+       FROM campaign_participations cp
+       WHERE cp.id = $1`,
+      [participationId]
+    );
+
+    if (participationResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Campaign participation not found' });
+    }
+
+    const participation = participationResult.rows[0];
+    const { class_id: classId, status } = participation;
+
+    if (status !== 'pending') {
+      return res.status(400).json({ success: false, error: 'Participation is not pending' });
+    }
+
+    // Check permission
+    const hasPermission = await checkTeacherPermission(userId, classId, 'can_fulfill_campaigns');
+    if (!hasPermission) {
+      return res.status(403).json({ success: false, error: 'You do not have permission to reject campaigns' });
+    }
+
+    // Update the participation status to rejected
+    await query(
+      `UPDATE campaign_participations SET status = 'rejected' WHERE id = $1`,
+      [participationId]
+    );
+
+    // Mark related messages as read
+    await query(
+      'UPDATE messages SET is_read = true WHERE campaign_participation_id = $1',
+      [participationId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Reject campaign error:', error);
+    res.status(500).json({ success: false, error: 'Failed to reject campaign' });
+  }
+});
+
 export default router;

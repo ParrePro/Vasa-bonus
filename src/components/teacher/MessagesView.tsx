@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, Mail } from "lucide-react";
+import { CheckCircle, Mail, X } from "lucide-react";
 import { format } from "date-fns";
 
 interface MessagesViewProps {
@@ -304,6 +304,76 @@ const MessagesView = ({ classId }: MessagesViewProps) => {
     loadMessages();
   };
 
+  const handleRejectReward = async (purchaseId: string, messageId: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/functions/reject-reward`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ purchaseId }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to reject reward');
+      }
+
+      toast({ title: "Reward rejected and points refunded!" });
+      loadMessages();
+    } catch (error: any) {
+      console.error("Error rejecting reward:", error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to reject reward",
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleRejectCampaign = async (participationId: string, messageId: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/functions/reject-campaign`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ participationId }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to reject campaign');
+      }
+
+      toast({ title: "Campaign participation rejected!" });
+      loadMessages();
+    } catch (error: any) {
+      console.error("Error rejecting campaign:", error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to reject campaign",
+        variant: "destructive" 
+      });
+    }
+  };
+
    const pendingMessages = messages.filter((m) => !m.is_read && (m.purchaseStatus === "pending" || m.participationStatus === "pending"));
    const readMessages = messages.filter((m) => m.is_read || (m.purchaseStatus !== "pending" && m.participationStatus !== "pending"));
 
@@ -344,13 +414,23 @@ const MessagesView = ({ classId }: MessagesViewProps) => {
                     <div className="flex gap-2">
                       {message.purchaseStatus === "pending" &&
                         (message.reward?.category === "tangible" || message.reward?.category === "privilege") && (
-                          <Button
-                            onClick={() => handleFulfill(message.id, message.reward_purchase_id)}
-                            size="sm"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Mark as Fulfilled
-                          </Button>
+                          <>
+                            <Button
+                              onClick={() => handleFulfill(message.id, message.reward_purchase_id)}
+                              size="sm"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Mark as Fulfilled
+                            </Button>
+                            <Button
+                              onClick={() => handleRejectReward(message.reward_purchase_id, message.id)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Reject
+                            </Button>
+                          </>
                       )}
 
                       <Button
@@ -376,6 +456,14 @@ const MessagesView = ({ classId }: MessagesViewProps) => {
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Approve
+                      </Button>
+                      <Button
+                        onClick={() => handleRejectCampaign(message.campaign_participation_id, message.id)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Reject
                       </Button>
                       <Button
                         variant="outline"

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, Package } from "lucide-react";
+import { CheckCircle, Package, X } from "lucide-react";
 import { format } from "date-fns";
 
 interface PendingRewardsViewProps {
@@ -134,6 +134,41 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
     }
   };
 
+  const handleReject = async (purchaseId: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/functions/reject-reward`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ purchaseId }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to reject reward');
+      }
+
+      toast({ title: "Reward rejected and points refunded!" });
+      loadPendingRewards();
+    } catch (error: any) {
+      console.error("Error rejecting reward:", error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to reject reward",
+        variant: "destructive" 
+      });
+    }
+  };
+
   const tangibleRewards = pendingRewards.filter(
     (r) => r.reward?.category === "tangible"
   );
@@ -184,13 +219,23 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
                   </div>
                 </div>
                 {canFulfillRewards && (
-                  <Button
-                    onClick={() => handleFulfill(purchase.id)}
-                    className="w-full"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Mark as Fulfilled
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleFulfill(purchase.id)}
+                      className="flex-1"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as Fulfilled
+                    </Button>
+                    <Button
+                      onClick={() => handleReject(purchase.id)}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Reject
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -234,13 +279,23 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
                   </div>
                 </div>
                 {canFulfillRewards && (
-                  <Button
-                    onClick={() => handleFulfill(purchase.id)}
-                    className="w-full"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Mark as Fulfilled
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleFulfill(purchase.id)}
+                      className="flex-1"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Mark as Fulfilled
+                    </Button>
+                    <Button
+                      onClick={() => handleReject(purchase.id)}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Reject
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
