@@ -91,12 +91,6 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
       // Get unique student IDs
       const schoolStudentIds = [...new Set(members.map(m => m.user_id))];
 
-      // Get auth emails
-      const { data: authUsers } = await supabase
-        .from("auth_users")
-        .select("id, email")
-        .in("id", schoolStudentIds);
-
       // Get points for each student
       const { data: points } = await supabase
         .from("points_transactions")
@@ -112,12 +106,11 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
       const resultsMap = new Map<string, Student>();
       filteredProfiles.forEach(profile => {
         if (schoolStudentIds.includes(profile.id)) {
-          const email = authUsers?.find(u => u.id === profile.id)?.email || "Unknown";
           const classCount = members.filter(m => m.user_id === profile.id).length;
           resultsMap.set(profile.id, {
             id: profile.id,
             name: profile.name,
-            email,
+            email: "N/A", // Email not available in Supabase
             created_at: new Date().toISOString(),
             total_points: pointsMap.get(profile.id) || 0,
             class_count: classCount,
