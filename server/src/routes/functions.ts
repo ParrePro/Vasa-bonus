@@ -585,7 +585,7 @@ router.post('/delete-student', authMiddleware, async (req: AuthRequest, res) => 
     }
 
     // Verify developer password
-    const DEVELOPER_MODE_PASSWORD = process.env.DEVELOPER_PASSWORD || 'dev-secure-password';
+    const DEVELOPER_MODE_PASSWORD = 'Hjärtatclutchar';
     if (developerPassword !== DEVELOPER_MODE_PASSWORD) {
       return res.status(401).json({ success: false, error: 'Incorrect developer password' });
     }
