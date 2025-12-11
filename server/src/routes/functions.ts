@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, AuthRequest } from '../auth';
 import { query } from '../db';
 import { sendEmail, getRewardRequestEmail, getCampaignRequestEmail } from '../email';
+import bcrypt from 'bcrypt';
 
 const router = Router();
 
@@ -600,8 +601,6 @@ router.post('/delete-student', authMiddleware, async (req: AuthRequest, res) => 
       return res.status(404).json({ success: false, error: 'Developer account not found' });
     }
 
-    // Import bcrypt for password comparison
-    const bcrypt = require('bcrypt');
     const passwordMatch = await bcrypt.compare(password, devPasswordResult.rows[0].password);
 
     if (!passwordMatch) {
