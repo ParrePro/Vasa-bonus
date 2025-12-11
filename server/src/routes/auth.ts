@@ -2,8 +2,14 @@ import { Router } from 'express';
 import { registerUser, loginUser, generateToken, authMiddleware, comparePassword } from '../auth';
 import { query } from '../db';
 import { AuthRequest } from '../auth';
+import { sendEmail, getVerificationEmail } from '../email';
 
 const router = Router();
+
+// Generate a 6-digit verification code
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 router.post('/register', async (req, res) => {
   try {
@@ -24,15 +30,87 @@ router.post('/register', async (req, res) => {
     }
 
     const userId = await registerUser(email, password, name);
-    const token = generateToken(userId, email);
+    
+    // Generate verification code
+    const verificationCode = generateVerificationCode();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Save verification code to database
+    await query(
+      `UPDATE profiles SET verification_code = $1, verification_code_expires_at = $2, is_verified = false WHERE id = $3`,
+      [verificationCode, expiresAt, userId]
+    );
+
+    // Send verification email
+    const { subject, html } = getVerificationEmail(verificationCode);
+    await sendEmail({ to: email, subject, html });
 
     res.json({
       user: { id: userId, email, name },
-      token,
+      message: 'Verification code sent to email. Please verify your account.',
+      requiresVerification: true,
     });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// Verify email code
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { email, verificationCode } = req.body;
+
+    if (!email || !verificationCode) {
+      return res.status(400).json({ error: 'Missing email or verification code' });
+    }
+
+    // Find user by email
+    const authResult = await query(
+      `SELECT id FROM auth_users WHERE email = $1`,
+      [email]
+    );
+
+    if (authResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userId = authResult.rows[0].id;
+
+    // Check verification code
+    const profileResult = await query(
+      `SELECT verification_code, verification_code_expires_at, is_verified FROM profiles WHERE id = $1`,
+      [userId]
+    );
+
+    if (profileResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    const profile = profileResult.rows[0];
+
+    if (profile.is_verified) {
+      return res.status(400).json({ error: 'Account already verified' });
+    }
+
+    if (profile.verification_code !== verificationCode) {
+      return res.status(401).json({ error: 'Invalid verification code' });
+    }
+
+    if (new Date(profile.verification_code_expires_at) < new Date()) {
+      return res.status(401).json({ error: 'Verification code expired' });
+    }
+
+    // Mark as verified
+    await query(
+      `UPDATE profiles SET is_verified = true, verification_code = NULL, verification_code_expires_at = NULL WHERE id = $1`,
+      [userId]
+    );
+
+    res.json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Verification error:', error);
+    res.status(500).json({ error: 'Verification failed' });
   }
 });
 
@@ -50,15 +128,30 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = generateToken(user.id, user.email);
-
-    const profile = await query(
-      `SELECT name FROM profiles WHERE id = $1`,
+    // Check if email is verified
+    const profileResult = await query(
+      `SELECT name, is_verified FROM profiles WHERE id = $1`,
       [user.id]
     );
 
+    if (profileResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const profile = profileResult.rows[0];
+
+    if (!profile.is_verified) {
+      return res.status(403).json({ 
+        error: 'Email not verified',
+        requiresVerification: true,
+        email: user.email
+      });
+    }
+
+    const token = generateToken(user.id, user.email);
+
     res.json({
-      user: { id: user.id, email: user.email, name: profile.rows[0]?.name },
+      user: { id: user.id, email: user.email, name: profile.name },
       token,
     });
   } catch (error) {
