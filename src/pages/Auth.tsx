@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import EmailVerification from "@/components/EmailVerification";
 import authBg from "@/assets/auth-background.jpg";
 
 const Auth = () => {
@@ -17,7 +16,6 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -40,18 +38,7 @@ const Auth = () => {
           password,
         );
 
-        if (error) {
-          // Check if it's because email is not verified
-          if (error.message?.includes('verified')) {
-            setVerificationEmail(email);
-            toast({
-              title: "Email Verification Required",
-              description: "Please verify your email before logging in.",
-            });
-            return;
-          }
-          throw error;
-        }
+        if (error) throw error;
 
         toast({
           title: "Welcome back!",
@@ -67,12 +54,11 @@ const Auth = () => {
 
         if (error) throw error;
 
-        // Show verification screen
-        setVerificationEmail(email);
         toast({
-          title: "Account created!",
-          description: "Please check your email to verify your account.",
+          title: "Account created successfully!",
+          description: "Welcome to VasaBonus!",
         });
+        navigate("/role-selection");
       }
     } catch (error: any) {
       toast({
@@ -84,33 +70,6 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
-  // Show email verification screen if needed
-  if (verificationEmail) {
-    return (
-      <EmailVerification
-        email={verificationEmail}
-        onVerified={() => {
-          setVerificationEmail("");
-          setIsLogin(true);
-          setEmail("");
-          setPassword("");
-          setName("");
-          toast({
-            title: "Ready to log in!",
-            description: "Your email has been verified. Please log in with your credentials.",
-          });
-        }}
-        onBackToLogin={() => {
-          setVerificationEmail("");
-          setIsLogin(true);
-          setEmail("");
-          setPassword("");
-          setName("");
-        }}
-      />
-    );
-  }
 
   return (
     <div 
