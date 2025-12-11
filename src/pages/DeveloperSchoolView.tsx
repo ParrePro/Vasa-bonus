@@ -12,8 +12,9 @@ import { ArrowLeft, LogOut, BarChart3, Trash2, Settings, AlertTriangle, Pencil }
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SchoolStats from "@/components/developer/SchoolStats";
+import StudentSearchDelete from "@/components/developer/StudentSearchDelete";
 
-type View = "classes" | "stats" | "settings";
+type View = "classes" | "stats" | "students" | "settings";
 
 const DeveloperSchoolView = () => {
   const { schoolId } = useParams();
@@ -336,6 +337,15 @@ const DeveloperSchoolView = () => {
             School Stats
           </Button>
 
+          <Button
+            variant={currentView === "students" ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => setCurrentView("students")}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete Students
+          </Button>
+
           <div className="pt-4 mt-4 border-t">
             <Button
               variant={currentView === "settings" ? "default" : "ghost"}
@@ -466,6 +476,10 @@ const DeveloperSchoolView = () => {
 
           {currentView === "stats" && (
             <SchoolStats schoolId={schoolId!} />
+          )}
+
+          {currentView === "students" && (
+            <StudentSearchDelete schoolId={schoolId!} />
           )}
 
           {currentView === "settings" && (

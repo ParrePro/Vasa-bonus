@@ -564,4 +564,80 @@ router.post('/reject-campaign', authMiddleware, async (req: AuthRequest, res) =>
   }
 });
 
+// Delete student account - developer only
+router.post('/delete-student', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    const { studentId, password, developerPassword } = req.body;
+
+    if (!userId || !studentId || !password || !developerPassword) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    // Check if requester is a developer
+    const devResult = await query(
+      `SELECT role FROM user_roles WHERE user_id = $1 AND role = 'developer'`,
+      [userId]
+    );
+
+    if (devResult.rows.length === 0) {
+      return res.status(403).json({ success: false, error: 'Only developers can delete student accounts' });
+    }
+
+    // Verify developer password
+    const DEVELOPER_MODE_PASSWORD = process.env.DEVELOPER_PASSWORD || 'dev-secure-password';
+    if (developerPassword !== DEVELOPER_MODE_PASSWORD) {
+      return res.status(401).json({ success: false, error: 'Incorrect developer password' });
+    }
+
+    // Get student's password to verify
+    const studentResult = await query(
+      `SELECT password FROM auth_users WHERE id = $1`,
+      [studentId]
+    );
+
+    if (studentResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Student not found' });
+    }
+
+    // Import bcrypt for password comparison
+    const bcrypt = require('bcrypt');
+    const passwordMatch = await bcrypt.compare(password, studentResult.rows[0].password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, error: 'Incorrect student password' });
+    }
+
+    // Delete in order to respect foreign key constraints
+    // Delete student's class memberships
+    await query(`DELETE FROM class_members WHERE user_id = $1`, [studentId]);
+
+    // Delete student's reward purchases
+    await query(`DELETE FROM reward_purchases WHERE student_id = $1`, [studentId]);
+
+    // Delete student's campaign participations
+    await query(`DELETE FROM campaign_participations WHERE student_id = $1`, [studentId]);
+
+    // Delete student's points transactions
+    await query(`DELETE FROM points_transactions WHERE student_id = $1 OR teacher_id = $1`, [studentId]);
+
+    // Delete student's messages
+    await query(`DELETE FROM messages WHERE student_id = $1 OR teacher_id = $1`, [studentId]);
+
+    // Delete student's profile
+    await query(`DELETE FROM profiles WHERE id = $1`, [studentId]);
+
+    // Delete student's user roles
+    await query(`DELETE FROM user_roles WHERE user_id = $1`, [studentId]);
+
+    // Delete student's auth account
+    await query(`DELETE FROM auth_users WHERE id = $1`, [studentId]);
+
+    res.json({ success: true, message: 'Student account deleted successfully' });
+  } catch (error) {
+    console.error('Delete student error:', error);
+    res.status(500).json({ success: false, error: 'Failed to delete student account' });
+  }
+});
+
 export default router;
