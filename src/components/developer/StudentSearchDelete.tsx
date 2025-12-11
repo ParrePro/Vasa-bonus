@@ -27,7 +27,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteStudentId, setDeleteStudentId] = useState<string | null>(null);
-  const [deletePassword, setDeletePassword] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
   const [developerPassword, setDeveloperPassword] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -87,7 +87,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
   };
 
   const handleDeleteStudent = async () => {
-    if (!deleteStudentId || !deletePassword.trim() || !developerPassword.trim()) {
+    if (!deleteStudentId || !accountPassword.trim() || !developerPassword.trim()) {
       toast({ 
         title: "Missing information", 
         description: "Please fill in all required fields",
@@ -113,7 +113,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
           },
           body: JSON.stringify({
             studentId: deleteStudentId,
-            password: deletePassword,
+            password: accountPassword,
             developerPassword,
           }),
         }
@@ -133,8 +133,9 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
       // Remove student from list
       setStudents(students.filter(s => s.id !== deleteStudentId));
       setDeleteStudentId(null);
-      setDeletePassword("");
+      setAccountPassword("");
       setDeveloperPassword("");
+      setDeleteDialogOpen(false);
     } catch (error: any) {
       console.error("Delete error:", error);
       toast({ 
@@ -189,7 +190,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
                   setDeleteDialogOpen(open);
                   if (!open) {
                     setDeleteStudentId(null);
-                    setDeletePassword("");
+                    setAccountPassword("");
                     setDeveloperPassword("");
                   }
                 }}>
@@ -225,16 +226,16 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
                     </AlertDialogHeader>
                     <div className="space-y-4 py-4">
                       <div>
-                        <label className="text-sm font-medium">Student's Password</label>
+                        <label className="text-sm font-medium">Developer Account Password</label>
                         <Input
                           type="password"
-                          placeholder="Enter student's account password"
-                          value={deletePassword}
-                          onChange={(e) => setDeletePassword(e.target.value)}
+                          placeholder="Enter your developer account password"
+                          value={accountPassword}
+                          onChange={(e) => setAccountPassword(e.target.value)}
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Developer Password</label>
+                        <label className="text-sm font-medium">Developer Mode Password</label>
                         <Input
                           type="password"
                           placeholder="Enter developer mode password"
@@ -246,14 +247,14 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
                     <AlertDialogFooter>
                       <AlertDialogCancel onClick={() => {
                         setDeleteStudentId(null);
-                        setDeletePassword("");
+                        setAccountPassword("");
                         setDeveloperPassword("");
                       }}>
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDeleteStudent()}
-                        disabled={deleteLoading || !deletePassword.trim() || !developerPassword.trim()}
+                        disabled={deleteLoading || !accountPassword.trim() || !developerPassword.trim()}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         {deleteLoading ? "Deleting..." : "Delete Permanently"}
