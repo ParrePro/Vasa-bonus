@@ -640,4 +640,98 @@ router.post('/delete-student', authMiddleware, async (req: AuthRequest, res) => 
   }
 });
 
+// Search students in a school
+router.post('/search-students', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    const { schoolId, searchTerm } = req.body;
+
+    if (!userId || !schoolId || !searchTerm) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Check if requester is a developer
+    const devResult = await query(
+      `SELECT role FROM user_roles WHERE user_id = $1 AND role = 'developer'`,
+      [userId]
+    );
+
+    if (devResult.rows.length === 0) {
+      return res.status(403).json({ error: 'Only developers can search students' });
+    }
+
+    // Get all classes in the school
+    const classesResult = await query(
+      `SELECT id FROM classes WHERE school_id = $1`,
+      [schoolId]
+    );
+
+    if (classesResult.rows.length === 0) {
+      return res.json({ students: [] });
+    }
+
+    const classIds = classesResult.rows.map(c => c.id);
+
+    // Search for students by name
+    const searchPattern = `%${searchTerm}%`;
+    const profilesResult = await query(
+      `SELECT id, name FROM profiles WHERE name ILIKE $1`,
+      [searchPattern]
+    );
+
+    if (profilesResult.rows.length === 0) {
+      return res.json({ students: [] });
+    }
+
+    const profileIds = profilesResult.rows.map(p => p.id);
+
+    // Get class members who are students
+    const membersResult = await query(
+      `SELECT DISTINCT cm.user_id, cm.class_id 
+       FROM class_members cm
+       WHERE cm.user_id = ANY($1::uuid[]) 
+         AND cm.class_id = ANY($2::uuid[])
+         AND cm.is_teacher = false`,
+      [profileIds, classIds]
+    );
+
+    if (membersResult.rows.length === 0) {
+      return res.json({ students: [] });
+    }
+
+    const schoolStudentIds = [...new Set(membersResult.rows.map(m => m.user_id))];
+
+    // Get student details including emails and points
+    const studentsDetailsResult = await query(
+      `SELECT 
+        p.id,
+        p.name,
+        au.email,
+        COALESCE(SUM(pt.points), 0) as total_points,
+        COUNT(DISTINCT cm.class_id) as class_count
+       FROM profiles p
+       JOIN auth_users au ON p.id = au.id
+       LEFT JOIN points_transactions pt ON p.id = pt.student_id
+       LEFT JOIN class_members cm ON p.id = cm.user_id AND cm.is_teacher = false
+       WHERE p.id = ANY($1::uuid[])
+       GROUP BY p.id, p.name, au.email`,
+      [schoolStudentIds]
+    );
+
+    const students = studentsDetailsResult.rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      total_points: parseInt(row.total_points),
+      class_count: parseInt(row.class_count),
+      created_at: new Date().toISOString(),
+    }));
+
+    res.json({ students });
+  } catch (error) {
+    console.error('Search students error:', error);
+    res.status(500).json({ error: 'Failed to search students' });
+  }
+});
+
 export default router;

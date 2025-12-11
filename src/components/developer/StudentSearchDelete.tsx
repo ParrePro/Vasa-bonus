@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Trash2, AlertTriangle } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 
 interface StudentSearchDeleteProps {
@@ -30,6 +30,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
   const [deletePassword, setDeletePassword] = useState("");
   const [developerPassword, setDeveloperPassword] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -41,84 +42,38 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
 
     setLoading(true);
     try {
-      // Get all classes in the school
-      const { data: classes } = await supabase
-        .from("classes")
-        .select("id")
-        .eq("school_id", schoolId);
-
-      if (!classes || classes.length === 0) {
-        toast({ title: "No classes found in this school" });
-        setLoading(false);
-        return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
       }
 
-      const classIds = classes.map(c => c.id);
-
-      // Search for students by name or email
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name");
-
-      if (!profiles || profiles.length === 0) {
-        toast({ title: "No students found" });
-        setStudents([]);
-        setLoading(false);
-        return;
-      }
-
-      // Filter by search term locally
-      const filteredProfiles = profiles.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      // Call backend API to search students
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/functions/search-students`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            schoolId,
+            searchTerm,
+          }),
+        }
       );
 
-      // Filter students who are in classes at this school
-      const studentIds = filteredProfiles.map(p => p.id);
-      const { data: members } = await supabase
-        .from("class_members")
-        .select("user_id, class_id")
-        .in("user_id", studentIds)
-        .in("class_id", classIds)
-        .eq("is_teacher", false);
+      const result = await response.json();
 
-      if (!members || members.length === 0) {
-        toast({ title: "No students found in this school" });
-        setStudents([]);
-        setLoading(false);
-        return;
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to search students');
       }
 
-      // Get unique student IDs
-      const schoolStudentIds = [...new Set(members.map(m => m.user_id))];
-
-      // Get points for each student
-      const { data: points } = await supabase
-        .from("points_transactions")
-        .select("student_id, points");
-
-      const pointsMap = new Map<string, number>();
-      (points || []).forEach(p => {
-        const current = pointsMap.get(p.student_id) || 0;
-        pointsMap.set(p.student_id, current + p.points);
-      });
-
-      // Combine data
-      const resultsMap = new Map<string, Student>();
-      filteredProfiles.forEach(profile => {
-        if (schoolStudentIds.includes(profile.id)) {
-          const classCount = members.filter(m => m.user_id === profile.id).length;
-          resultsMap.set(profile.id, {
-            id: profile.id,
-            name: profile.name,
-            email: "N/A", // Email not available in Supabase
-            created_at: new Date().toISOString(),
-            total_points: pointsMap.get(profile.id) || 0,
-            class_count: classCount,
-          });
-        }
-      });
-
-      setStudents(Array.from(resultsMap.values()));
+      setStudents(result.students || []);
+      
+      if (result.students.length === 0) {
+        toast({ title: "No students found" });
+      }
     } catch (error) {
       console.error("Search error:", error);
       toast({ 
@@ -230,71 +185,81 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
                     </Badge>
                   </div>
                 </div>
-                <AlertDialog>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteStudentId(student.id)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
-                  {deleteStudentId === student.id && (
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
-                          <AlertTriangle className="w-5 h-5 text-destructive" />
-                          Delete Student Account
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently delete <strong>{student.name}</strong>'s account and all associated data including:
-                          <ul className="list-disc list-inside mt-2 space-y-1">
-                            <li>Class memberships</li>
-                            <li>Points transactions</li>
-                            <li>Rewards</li>
-                            <li>Messages</li>
-                          </ul>
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div>
-                          <label className="text-sm font-medium">Student's Password</label>
-                          <Input
-                            type="password"
-                            placeholder="Enter student's account password"
-                            value={deletePassword}
-                            onChange={(e) => setDeletePassword(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium">Developer Password</label>
-                          <Input
-                            type="password"
-                            placeholder="Enter developer mode password"
-                            value={developerPassword}
-                            onChange={(e) => setDeveloperPassword(e.target.value)}
-                          />
-                        </div>
+                <AlertDialog open={deleteDialogOpen && deleteStudentId === student.id} onOpenChange={(open) => {
+                  setDeleteDialogOpen(open);
+                  if (!open) {
+                    setDeleteStudentId(null);
+                    setDeletePassword("");
+                    setDeveloperPassword("");
+                  }
+                }}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setDeleteStudentId(student.id);
+                        setDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-destructive" />
+                        Delete Student Account
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete <strong>{student.name}</strong>'s account and all associated data including:
+                        <ul className="list-disc list-inside mt-2 space-y-1">
+                          <li>Class memberships</li>
+                          <li>Points transactions</li>
+                          <li>Rewards</li>
+                          <li>Messages</li>
+                        </ul>
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <label className="text-sm font-medium">Student's Password</label>
+                        <Input
+                          type="password"
+                          placeholder="Enter student's account password"
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                        />
                       </div>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => {
-                          setDeleteStudentId(null);
-                          setDeletePassword("");
-                          setDeveloperPassword("");
-                        }}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDeleteStudent}
-                          disabled={deleteLoading || !deletePassword.trim() || !developerPassword.trim()}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {deleteLoading ? "Deleting..." : "Delete Permanently"}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  )}
+                      <div>
+                        <label className="text-sm font-medium">Developer Password</label>
+                        <Input
+                          type="password"
+                          placeholder="Enter developer mode password"
+                          value={developerPassword}
+                          onChange={(e) => setDeveloperPassword(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => {
+                        setDeleteStudentId(null);
+                        setDeletePassword("");
+                        setDeveloperPassword("");
+                      }}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteStudent()}
+                        disabled={deleteLoading || !deletePassword.trim() || !developerPassword.trim()}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {deleteLoading ? "Deleting..." : "Delete Permanently"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
                 </AlertDialog>
               </div>
             ))}
