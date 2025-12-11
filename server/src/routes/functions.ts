@@ -590,22 +590,32 @@ router.post('/delete-student', authMiddleware, async (req: AuthRequest, res) => 
       return res.status(401).json({ success: false, error: 'Incorrect developer password' });
     }
 
-    // Get student's password to verify
-    const studentResult = await query(
+    // Verify developer's own account password
+    const devPasswordResult = await query(
       `SELECT password FROM auth_users WHERE id = $1`,
-      [studentId]
+      [userId]
     );
 
-    if (studentResult.rows.length === 0) {
-      return res.status(404).json({ success: false, error: 'Student not found' });
+    if (devPasswordResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Developer account not found' });
     }
 
     // Import bcrypt for password comparison
     const bcrypt = require('bcrypt');
-    const passwordMatch = await bcrypt.compare(password, studentResult.rows[0].password);
+    const passwordMatch = await bcrypt.compare(password, devPasswordResult.rows[0].password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ success: false, error: 'Incorrect student password' });
+      return res.status(401).json({ success: false, error: 'Incorrect developer account password' });
+    }
+
+    // Verify student exists
+    const studentExistsResult = await query(
+      `SELECT id FROM profiles WHERE id = $1`,
+      [studentId]
+    );
+
+    if (studentExistsResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Student not found' });
     }
 
     // Delete in order to respect foreign key constraints
