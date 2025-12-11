@@ -58,8 +58,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
       // Search for students by name or email
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, name")
-        .ilike("name", `%${searchTerm}%`);
+        .select("id, name");
 
       if (!profiles || profiles.length === 0) {
         toast({ title: "No students found" });
@@ -68,8 +67,13 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
         return;
       }
 
+      // Filter by search term locally
+      const filteredProfiles = profiles.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
       // Filter students who are in classes at this school
-      const studentIds = profiles.map(p => p.id);
+      const studentIds = filteredProfiles.map(p => p.id);
       const { data: members } = await supabase
         .from("class_members")
         .select("user_id, class_id")
@@ -106,7 +110,7 @@ const StudentSearchDelete = ({ schoolId }: StudentSearchDeleteProps) => {
 
       // Combine data
       const resultsMap = new Map<string, Student>();
-      profiles.forEach(profile => {
+      filteredProfiles.forEach(profile => {
         if (schoolStudentIds.includes(profile.id)) {
           const email = authUsers?.find(u => u.id === profile.id)?.email || "Unknown";
           const classCount = members.filter(m => m.user_id === profile.id).length;
