@@ -708,7 +708,7 @@ router.post('/search-students', authMiddleware, async (req: AuthRequest, res) =>
         COUNT(DISTINCT cm.class_id) as class_count
        FROM profiles p
        JOIN auth_users au ON p.id = au.id
-       LEFT JOIN points_transactions pt ON p.id = pt.student_id
+       LEFT JOIN points_transactions pt ON p.id = pt.student_id AND pt.class_id = ANY($2::uuid[])
        LEFT JOIN class_members cm ON p.id = cm.user_id AND cm.is_teacher = false AND cm.class_id = ANY($2::uuid[])
        WHERE p.id = ANY($1::uuid[])
        GROUP BY p.id, p.name, au.email
