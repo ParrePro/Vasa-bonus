@@ -126,7 +126,7 @@ export default function PointsTransfer({ schoolId }: PointsTransferProps) {
             toStudentId: toStudent.id,
             points: pointsNum,
             reason: reason || 'Admin transfer',
-            classId: schoolId, // Using schoolId as classId for now
+            schoolId: schoolId,
           }),
         }
       );

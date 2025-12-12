@@ -736,9 +736,9 @@ router.post('/search-students', authMiddleware, async (req: AuthRequest, res) =>
 router.post('/transfer-points', authMiddleware, async (req: AuthRequest, res) => {
   try {
     const userId = req.user?.id;
-    const { fromStudentId, toStudentId, points, reason, classId } = req.body;
+    const { fromStudentId, toStudentId, points, reason, schoolId } = req.body;
 
-    if (!userId || !fromStudentId || !toStudentId || !points || !reason || !classId) {
+    if (!userId || !fromStudentId || !toStudentId || !points || !reason || !schoolId) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
@@ -775,13 +775,26 @@ router.post('/transfer-points', authMiddleware, async (req: AuthRequest, res) =>
       return res.status(404).json({ success: false, error: 'To student not found' });
     }
 
-    // Check if from student has enough points
-    const fromPointsResult = await query(
-      `SELECT COALESCE(SUM(points), 0) as total FROM points_transactions WHERE student_id = $1 AND class_id = $2`,
-      [fromStudentId, classId]
+    // Get all classes in the school
+    const classesResult = await query(
+      `SELECT id FROM classes WHERE school_id = $1`,
+      [schoolId]
     );
 
-    const fromStudentPoints = fromPointsResult.rows[0].total;
+    if (classesResult.rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'No classes found in this school' });
+    }
+
+    const classIds = classesResult.rows.map(c => c.id);
+
+    // Check if from student has enough total points across all classes in the school
+    const fromPointsResult = await query(
+      `SELECT COALESCE(SUM(points), 0) as total FROM points_transactions 
+       WHERE student_id = $1 AND class_id = ANY($2::uuid[])`,
+      [fromStudentId, classIds]
+    );
+
+    const fromStudentPoints = parseInt(fromPointsResult.rows[0].total);
 
     if (fromStudentPoints < points) {
       return res.status(400).json({ 
@@ -790,18 +803,37 @@ router.post('/transfer-points', authMiddleware, async (req: AuthRequest, res) =>
       });
     }
 
+    // Find a common class where both students are members to record the transaction
+    const commonClassResult = await query(
+      `SELECT DISTINCT cm1.class_id 
+       FROM class_members cm1
+       JOIN class_members cm2 ON cm1.class_id = cm2.class_id
+       WHERE cm1.user_id = $1 AND cm2.user_id = $2 AND cm1.class_id = ANY($3::uuid[])
+       LIMIT 1`,
+      [fromStudentId, toStudentId, classIds]
+    );
+
+    let transactionClassId: string;
+    
+    if (commonClassResult.rows.length > 0) {
+      transactionClassId = commonClassResult.rows[0].class_id;
+    } else {
+      // If no common class, use the first class in the school (this is a fallback)
+      transactionClassId = classIds[0];
+    }
+
     // Create a transaction record for points removal (negative points)
     await query(
       `INSERT INTO points_transactions (student_id, class_id, points, reason, teacher_id, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [fromStudentId, classId, -points, `Points transferred out: ${reason}`, userId]
+      [fromStudentId, transactionClassId, -points, `Points transferred out: ${reason}`, userId]
     );
 
     // Create a transaction record for points addition
     await query(
       `INSERT INTO points_transactions (student_id, class_id, points, reason, teacher_id, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [toStudentId, classId, points, `Points transferred in: ${reason}`, userId]
+      [toStudentId, transactionClassId, points, `Points transferred in: ${reason}`, userId]
     );
 
     res.json({ 
