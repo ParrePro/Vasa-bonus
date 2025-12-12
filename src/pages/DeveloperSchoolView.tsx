@@ -572,6 +572,8 @@ const DeveloperSchoolView = () => {
                 </div>
               </CardContent>
             </Card>
+          )}
+
           {currentView === "transfer" && (
             <PointsTransfer schoolId={schoolId || ""} />
           )}
