@@ -709,10 +709,11 @@ router.post('/search-students', authMiddleware, async (req: AuthRequest, res) =>
        FROM profiles p
        JOIN auth_users au ON p.id = au.id
        LEFT JOIN points_transactions pt ON p.id = pt.student_id
-       LEFT JOIN class_members cm ON p.id = cm.user_id AND cm.is_teacher = false
+       LEFT JOIN class_members cm ON p.id = cm.user_id AND cm.is_teacher = false AND cm.class_id = ANY($2::uuid[])
        WHERE p.id = ANY($1::uuid[])
-       GROUP BY p.id, p.name, au.email`,
-      [schoolStudentIds]
+       GROUP BY p.id, p.name, au.email
+       ORDER BY p.name`,
+      [schoolStudentIds, classIds]
     );
 
     const students = studentsDetailsResult.rows.map(row => ({
