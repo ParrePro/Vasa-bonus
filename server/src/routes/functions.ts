@@ -731,4 +731,89 @@ router.post('/search-students', authMiddleware, async (req: AuthRequest, res) =>
   }
 });
 
+// Transfer points between students - developer only
+router.post('/transfer-points', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    const { fromStudentId, toStudentId, points, reason, classId } = req.body;
+
+    if (!userId || !fromStudentId || !toStudentId || !points || !reason || !classId) {
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+
+    if (points <= 0) {
+      return res.status(400).json({ success: false, error: 'Points must be greater than 0' });
+    }
+
+    // Check if requester is a developer
+    const devResult = await query(
+      `SELECT role FROM user_roles WHERE user_id = $1 AND role = 'developer'`,
+      [userId]
+    );
+
+    if (devResult.rows.length === 0) {
+      return res.status(403).json({ success: false, error: 'Only developers can transfer points' });
+    }
+
+    // Verify both students exist
+    const fromStudentResult = await query(
+      `SELECT id FROM profiles WHERE id = $1`,
+      [fromStudentId]
+    );
+
+    if (fromStudentResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'From student not found' });
+    }
+
+    const toStudentResult = await query(
+      `SELECT id FROM profiles WHERE id = $1`,
+      [toStudentId]
+    );
+
+    if (toStudentResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'To student not found' });
+    }
+
+    // Check if from student has enough points
+    const fromPointsResult = await query(
+      `SELECT COALESCE(SUM(points), 0) as total FROM points_transactions WHERE student_id = $1 AND class_id = $2`,
+      [fromStudentId, classId]
+    );
+
+    const fromStudentPoints = fromPointsResult.rows[0].total;
+
+    if (fromStudentPoints < points) {
+      return res.status(400).json({ 
+        success: false, 
+        error: `Student only has ${fromStudentPoints} points, cannot transfer ${points}` 
+      });
+    }
+
+    // Create a transaction record for points removal (negative points)
+    await query(
+      `INSERT INTO points_transactions (student_id, class_id, points, reason, teacher_id, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [fromStudentId, classId, -points, `Points transferred out: ${reason}`, userId]
+    );
+
+    // Create a transaction record for points addition
+    await query(
+      `INSERT INTO points_transactions (student_id, class_id, points, reason, teacher_id, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [toStudentId, classId, points, `Points transferred in: ${reason}`, userId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: `Successfully transferred ${points} points from student to student`,
+      fromStudentId,
+      toStudentId,
+      points
+    });
+  } catch (error) {
+    console.error('Transfer points error:', error);
+    res.status(500).json({ success: false, error: 'Failed to transfer points' });
+  }
+});
+
 export default router;

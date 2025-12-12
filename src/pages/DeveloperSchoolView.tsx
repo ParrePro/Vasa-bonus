@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTierFavicon } from "@/hooks/use-tier-favicon";
-import { ArrowLeft, LogOut, BarChart3, Trash2, Settings, AlertTriangle, Pencil } from "lucide-react";
+import { ArrowLeft, LogOut, BarChart3, Trash2, Settings, AlertTriangle, Pencil, Send } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SchoolStats from "@/components/developer/SchoolStats";
 import StudentSearchDelete from "@/components/developer/StudentSearchDelete";
+import PointsTransfer from "@/components/developer/PointsTransfer";
 
-type View = "classes" | "stats" | "students" | "settings";
+type View = "classes" | "stats" | "students" | "settings" | "transfer";
 
 const DeveloperSchoolView = () => {
   const { schoolId } = useParams();
@@ -346,6 +347,15 @@ const DeveloperSchoolView = () => {
             Delete Students
           </Button>
 
+          <Button
+            variant={currentView === "transfer" ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => setCurrentView("transfer")}
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Transfer Points
+          </Button>
+
           <div className="pt-4 mt-4 border-t">
             <Button
               variant={currentView === "settings" ? "default" : "ghost"}
@@ -562,6 +572,8 @@ const DeveloperSchoolView = () => {
                 </div>
               </CardContent>
             </Card>
+          {currentView === "transfer" && (
+            <PointsTransfer schoolId={schoolId || ""} />
           )}
         </main>
       </div>
