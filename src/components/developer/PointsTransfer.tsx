@@ -110,8 +110,8 @@ export default function PointsTransfer({ schoolId }: PointsTransferProps) {
 
     setTransferLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('Not authenticated');
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/functions/transfer-points`,
@@ -119,7 +119,7 @@ export default function PointsTransfer({ schoolId }: PointsTransferProps) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             fromStudentId: fromStudent.id,
