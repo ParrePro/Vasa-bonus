@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, AlertTriangle, Settings } from "lucide-react";
 import ProfileCustomization from "@/components/ProfileCustomization";
+import TeacherEmailSettings from "@/components/teacher/TeacherEmailSettings";
 
 interface AccountSettingsProps {
   userRole: "student" | "teacher" | "developer";
@@ -130,6 +131,11 @@ const AccountSettings = ({ userRole, classes = [], onClassDeleted, tier = 'basic
       {/* Profile Customization - for students */}
       {userRole === "student" && (
         <ProfileCustomization tier={tier} />
+      )}
+
+      {/* Email Notifications - for teachers */}
+      {userRole === "teacher" && classes.length > 0 && (
+        <TeacherEmailSettings classes={classes} />
       )}
 
       <Card>

@@ -23,7 +23,8 @@ async function sendPendingReminders() {
         p.name as student_name,
         c.name as class_name,
         au.email as teacher_email,
-        cm.user_id as teacher_id
+        cm.user_id as teacher_id,
+        cm.receive_email_notifications
       FROM reward_purchases rp
       JOIN rewards r ON r.id = rp.reward_id
       JOIN profiles p ON p.id = rp.student_id
@@ -39,6 +40,11 @@ async function sendPendingReminders() {
     console.log(`Found ${pendingRewardsResult.rows.length} pending reward(s) needing reminders`);
 
     for (const reward of pendingRewardsResult.rows) {
+      // Skip if email notifications are disabled for this teacher in this class
+      if (reward.receive_email_notifications === false) {
+        continue;
+      }
+
       const daysPending = Math.floor(
         (Date.now() - new Date(reward.purchased_at).getTime()) / (1000 * 60 * 60 * 24)
       );
@@ -79,7 +85,8 @@ async function sendPendingReminders() {
         p.name as student_name,
         c.name as class_name,
         au.email as teacher_email,
-        cm.user_id as teacher_id
+        cm.user_id as teacher_id,
+        cm.receive_email_notifications
       FROM campaign_participations cp
       JOIN campaigns cam ON cam.id = cp.campaign_id
       JOIN profiles p ON p.id = cp.student_id
@@ -95,6 +102,11 @@ async function sendPendingReminders() {
     console.log(`Found ${pendingCampaignsResult.rows.length} pending campaign(s) needing reminders`);
 
     for (const campaign of pendingCampaignsResult.rows) {
+      // Skip if email notifications are disabled for this teacher in this class
+      if (campaign.receive_email_notifications === false) {
+        continue;
+      }
+
       const daysPending = Math.floor(
         (Date.now() - new Date(campaign.joined_at).getTime()) / (1000 * 60 * 60 * 24)
       );

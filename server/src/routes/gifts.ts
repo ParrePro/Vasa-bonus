@@ -297,7 +297,7 @@ router.post('/reward', authMiddleware, async (req: AuthRequest, res) => {
     // Send email to teachers who can fulfill rewards (same as regular purchase)
     console.log('Looking for teachers to notify for class:', classId);
     const teachersResult = await query(
-      `SELECT au.email, p.name as teacher_name
+      `SELECT au.email, p.name as teacher_name, cm.receive_email_notifications
        FROM class_members cm
        JOIN auth_users au ON au.id = cm.user_id
        JOIN profiles p ON p.id = cm.user_id
@@ -310,15 +310,17 @@ router.post('/reward', authMiddleware, async (req: AuthRequest, res) => {
 
     console.log('Found teachers to notify:', teachersResult.rows.length, 'teachers');
 
-    // Send email to each eligible teacher
+    // Send email to each eligible teacher if they have email notifications enabled
     for (const teacher of teachersResult.rows) {
-      console.log('Sending reward request email to teacher:', teacher.email);
-      const teacherEmailContent = getRewardRequestEmail(recipientName, reward.title, className);
-      await sendEmail({
-        to: teacher.email,
-        subject: teacherEmailContent.subject,
-        html: teacherEmailContent.html,
-      });
+      if (teacher.receive_email_notifications === true || teacher.receive_email_notifications === null) {
+        console.log('Sending reward request email to teacher:', teacher.email);
+        const teacherEmailContent = getRewardRequestEmail(recipientName, reward.title, className);
+        await sendEmail({
+          to: teacher.email,
+          subject: teacherEmailContent.subject,
+          html: teacherEmailContent.html,
+        });
+      }
     }
 
     res.json({ 
