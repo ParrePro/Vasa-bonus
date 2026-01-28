@@ -730,7 +730,7 @@ const TeacherClassView = () => {
 
   if (selectedStudent) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background" data-student-panel={selectedStudent.id}>
         <header className="border-b px-6 py-4">
           <Button variant="ghost" onClick={() => { setSelectedStudent(null); setTotalPoints(0); }} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />

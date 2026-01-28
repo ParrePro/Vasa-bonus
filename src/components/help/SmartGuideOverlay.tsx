@@ -41,9 +41,25 @@ const SmartGuideOverlay = ({
   useEffect(() => {
     if (isOpen) {
       setPosition({ x: window.innerWidth / 2 - 200, y: window.innerHeight / 2 - 150 });
-      setCurrentStep(0);
+      
+      // Smart step detection: check if you're already in a state that requires later steps
+      let initialStep = 0;
+      
+      if (steps.length > 0) {
+        // Check if already on class page
+        if (steps[0].waitFor?.type === "navigation" && location.pathname.includes("/teacher/class/")) {
+          initialStep = 1;
+          
+          // Check if a student is already selected by looking for the data-student-panel attribute
+          if (document.querySelector('[data-student-panel]')) {
+            initialStep = 2; // Skip to reason clicking step
+          }
+        }
+      }
+      
+      setCurrentStep(initialStep);
     }
-  }, [isOpen]);
+  }, [isOpen, location.pathname, steps]);
 
   // Auto-advance based on navigation
   useEffect(() => {
