@@ -57,6 +57,40 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     }
   }, [title, description, pointsCost]);
 
+  // Dispatch event when category is selected
+  useEffect(() => {
+    const event = new CustomEvent('guide-event', {
+      detail: { action: 'reward-category-selected' }
+    });
+    document.dispatchEvent(event);
+  }, [category]);
+
+  // Dispatch event when image is selected
+  useEffect(() => {
+    if (imageFile || imagePreview) {
+      const event = new CustomEvent('guide-event', {
+        detail: { action: 'reward-image-selected' }
+      });
+      document.dispatchEvent(event);
+    }
+  }, [imageFile, imagePreview]);
+
+  // Dispatch event when purchase limit is selected
+  useEffect(() => {
+    const event = new CustomEvent('guide-event', {
+      detail: { action: 'reward-purchase-limit-selected' }
+    });
+    document.dispatchEvent(event);
+  }, [purchaseLimitType, purchaseLimitCount]);
+
+  // Dispatch event when availability is selected
+  useEffect(() => {
+    const event = new CustomEvent('guide-event', {
+      detail: { action: 'reward-availability-selected' }
+    });
+    document.dispatchEvent(event);
+  }, [availabilityType, availableUntil]);
+
   const loadRewards = async () => {
     try {
       const { data: rewardClassData, error: rcError } = await supabase
@@ -312,6 +346,15 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     }
 
     toast({ title: editingReward ? "Reward updated successfully!" : "Reward created successfully!" });
+    
+    // Dispatch event for guide progression when reward is created (not when editing)
+    if (!editingReward) {
+      const event = new CustomEvent('guide-event', {
+        detail: { action: 'reward-created' }
+      });
+      document.dispatchEvent(event);
+    }
+    
     resetForm();
     setDialogOpen(false);
     loadRewards();

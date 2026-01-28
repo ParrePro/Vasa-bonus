@@ -85,38 +85,40 @@ export const createRewardSmartGuide: GuideStep[] = [
     id: "step-5",
     title: "🏷️ Choose a Category",
     instruction:
-      "Select a category: Tangible (physical items), Symbolic (certificates/badges), or Privilege (special activities). This helps organize rewards for students. Then click 'Next' to continue.",
+      "Select a category: Tangible (physical items), Symbolic (certificates/badges), or Privilege (special activities). This helps organize rewards for students. The guide will advance automatically when you select a category.",
     waitFor: {
-      type: "custom",
+      type: "event",
+      value: "reward-category-selected",
     },
   },
   {
     id: "step-6",
     title: "🎨 Add Image (Optional)",
     instruction:
-      "You can upload an image to make the reward more appealing to students. This image will show in their rewards catalog. Then click 'Next' when ready.",
+      "You can upload an image to make the reward more appealing to students. This image will show in their rewards catalog. The guide will advance automatically when you select an image, or you can skip this step.",
     waitFor: {
-      type: "custom",
+      type: "event",
+      value: "reward-image-selected",
     },
   },
   {
     id: "step-7",
     title: "🔄 Set Purchase Limits",
     instruction:
-      "Choose how many times students can get this reward: 'Once' (limited supply), 'Unlimited' (always available), or 'Custom' (set a specific number).",
+      "Choose how many times students can get this reward: 'Once' (limited supply), 'Unlimited' (always available), or 'Custom' (set a specific number). The guide will advance when you make a selection.",
     waitFor: {
-      type: "element-click",
-      value: "[data-guide='reward-purchase-limit']",
+      type: "event",
+      value: "reward-purchase-limit-selected",
     },
   },
   {
     id: "step-8",
     title: "📅 Set Availability",
     instruction:
-      "Decide if the reward is available all year or for a limited time. You can set specific start and end dates if needed.",
+      "Decide if the reward is available all year or for a limited time. The guide will advance when you make a selection.",
     waitFor: {
-      type: "element-click",
-      value: "[data-guide='reward-availability']",
+      type: "event",
+      value: "reward-availability-selected",
     },
   },
   {
@@ -125,8 +127,8 @@ export const createRewardSmartGuide: GuideStep[] = [
     instruction:
       "Click 'Create Reward' to save it. Your reward is now available for students to redeem with their points!",
     waitFor: {
-      type: "element-click",
-      value: "[data-guide='create-reward-submit']",
+      type: "event",
+      value: "reward-created",
     },
   },
   {
