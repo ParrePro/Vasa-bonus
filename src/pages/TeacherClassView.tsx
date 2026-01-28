@@ -626,6 +626,11 @@ const TeacherClassView = () => {
           : `${selectedStudent.name} received ${points} points for ${reason}`,
       });
 
+      // Dispatch custom event for guide completion
+      document.dispatchEvent(new CustomEvent('guide-event', {
+        detail: { action: 'points-given' }
+      }));
+
       // Reload total points
       loadTotalPoints();
     } catch (error: any) {

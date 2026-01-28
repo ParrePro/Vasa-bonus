@@ -5,7 +5,7 @@ export const givePointsSmartGuide: GuideStep[] = [
     id: "step-1",
     title: "📚 Welcome to Give Points Guide",
     instruction:
-      "Let's learn how to give points to your students. First, click on 'My Classes' in the sidebar or navigate to your classes.",
+      "Let's learn how to give points to your students. First, navigate to your classes by clicking 'My Classes' in the sidebar.",
     waitFor: {
       type: "navigation",
       value: "/teacher/class/",
@@ -13,49 +13,39 @@ export const givePointsSmartGuide: GuideStep[] = [
   },
   {
     id: "step-2",
-    title: "🎯 Select Your Class",
+    title: "🎯 Select Your Student",
     instruction:
-      "Great! Now you're in your classes. Click on the class that contains the student you want to give points to.",
-    waitFor: {
-      type: "element-click",
-      value: "[data-guide='class-button']",
-    },
-  },
-  {
-    id: "step-3",
-    title: "👥 Find Your Student",
-    instruction:
-      "Perfect! You're in the class. Now scroll down to the 'Members' section and find the student you want to give points to. Click on that student.",
+      "Perfect! You're in the class. Now scroll down and find the student you want to give points to. Click on that student.",
     waitFor: {
       type: "element-click",
       value: "[data-guide='student-select']",
     },
   },
   {
-    id: "step-4",
+    id: "step-3",
     title: "⭐ Choose a Reason",
     instruction:
-      "Excellent! Now you can see the student details. You can either click on one of the preset reasons (like 'Good Behavior', 'Great Assignment') or click 'Custom Points' to enter your own amount and reason.",
+      "Excellent! Now you can see the student details. You can either click on one of the preset reasons (like preset point buttons) or click 'Custom Points' to enter your own amount and reason.",
     waitFor: {
       type: "element-click",
-      value: "[data-guide='points-button'], [data-guide='custom-points-button']",
+      value: "[data-guide='submit-points'], [data-guide='custom-points-button']",
+    },
+  },
+  {
+    id: "step-4",
+    title: "✅ Confirm Points",
+    instruction:
+      "If you chose a preset reason, the points will be added immediately. If you chose custom, fill in the points and reason, then click 'Give Points'.",
+    waitFor: {
+      type: "event",
+      value: "points-given",
     },
   },
   {
     id: "step-5",
-    title: "✅ Give the Points",
-    instruction:
-      "Click 'Give Points' to award the points to the student. The points will be added to their account immediately.",
-    waitFor: {
-      type: "element-click",
-      value: "[data-guide='submit-points']",
-    },
-  },
-  {
-    id: "step-6",
     title: "🎉 Success!",
     instruction:
-      "Congratulations! You've successfully given points to a student. You'll see a confirmation message. You can now give points to other students or close this guide.",
+      "Congratulations! You've successfully given points to a student. The points are now added to their account. You can continue with other students or close this guide.",
     position: "center",
   },
 ];
@@ -75,7 +65,7 @@ export const createRewardSmartGuide: GuideStep[] = [
     id: "step-2",
     title: "🏆 Find Rewards Section",
     instruction:
-      "Great! You're in a class. Now look for the 'Rewards' tab or section and click on it.",
+      "Great! You're in a class. Now look for the 'Rewards' tab at the top and click on it.",
     waitFor: {
       type: "element-click",
       value: "[data-guide='rewards-tab']",
@@ -173,7 +163,7 @@ export const createCampaignSmartGuide: GuideStep[] = [
     id: "step-2",
     title: "📊 Find Campaigns Section",
     instruction:
-      "Great! You're in a class. Look for the 'Campaigns' tab or section and click on it.",
+      "Great! You're in a class. Look for the 'Campaigns' tab at the top and click on it.",
     waitFor: {
       type: "element-click",
       value: "[data-guide='campaigns-tab']",
