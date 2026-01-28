@@ -893,11 +893,11 @@ const TeacherClassView = () => {
               <Users className="w-4 h-4 mr-2" />
               Members
             </TabsTrigger>
-            <TabsTrigger value="rewards">
+            <TabsTrigger value="rewards" data-guide="rewards-tab">
               <Gift className="w-4 h-4 mr-2" />
               Rewards
             </TabsTrigger>
-            <TabsTrigger value="campaigns">
+            <TabsTrigger value="campaigns" data-guide="campaigns-tab">
               <Zap className="w-4 h-4 mr-2" />
               Campaigns
             </TabsTrigger>
@@ -1010,6 +1010,7 @@ const TeacherClassView = () => {
                           setSelectedStudent(student);
                         }
                       }}
+                      data-guide="student-select"
                     >
                       {bulkMode && (
                         <div className="flex items-center">

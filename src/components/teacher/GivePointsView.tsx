@@ -55,6 +55,7 @@ const GivePointsView = () => {
                 variant="outline"
                 className="w-full justify-between"
                 onClick={() => navigate(`/teacher/class/${cls.id}`)}
+                data-guide="class-button"
               >
                 <span>{cls.name}</span>
                 <span className="text-sm text-muted-foreground">{cls.code}</span>
