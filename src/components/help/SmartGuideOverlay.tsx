@@ -183,6 +183,7 @@ const SmartGuideOverlay = ({
 
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     handleNext();
   };
 
@@ -288,7 +289,7 @@ const SmartGuideOverlay = ({
 
           {/* Action buttons */}
           {(!step.waitFor || step.waitFor.type === "custom") && (
-            <Button onClick={handleNextClick} size="sm" className="w-full mt-1.5 h-8 text-xs">
+            <Button onClick={handleNextClick} size="sm" className="w-full mt-1.5 h-8 text-xs" data-guide-button="true">
               {isLastStep ? (
                 <>
                   Done <ChevronRight className="w-3 h-3 ml-1" />
