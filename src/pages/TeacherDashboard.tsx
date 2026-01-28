@@ -12,6 +12,9 @@ import CreateClassView from "@/components/teacher/CreateClassView";
 import JoinClassView from "@/components/teacher/JoinClassView";
 import FulfilledRewardsView from "@/components/teacher/FulfilledRewardsView";
 import AccountSettings from "@/components/AccountSettings";
+import HelpButton from "@/components/help/HelpButton";
+import GuideOverlay from "@/components/help/GuideOverlay";
+import { guides } from "@/components/help/guides";
 
 type View = "give-points" | "create-class" | "join-class" | "fulfilled" | "settings";
 
@@ -20,6 +23,7 @@ const TeacherDashboard = () => {
   const [userName, setUserName] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [classes, setClasses] = useState<{ id: string; name: string; code: string }[]>([]);
+  const [activeGuide, setActiveGuide] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -122,6 +126,14 @@ const TeacherDashboard = () => {
           {currentView === "settings" && <AccountSettings userRole="teacher" classes={classes} onClassDeleted={loadClasses} />}
         </main>
       </div>
+
+      <HelpButton onSelectGuide={setActiveGuide} />
+      <GuideOverlay
+        isOpen={activeGuide !== null}
+        steps={activeGuide ? guides[activeGuide] || [] : []}
+        onClose={() => setActiveGuide(null)}
+        title={activeGuide ? guides[activeGuide]?.[0]?.title || "Guide" : "Guide"}
+      />
     </div>
   );
 };

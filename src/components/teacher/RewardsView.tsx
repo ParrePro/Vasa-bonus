@@ -392,7 +392,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
             }
           }}>
             <DialogTrigger asChild>
-              <Button>
+              <Button data-guide="add-reward-button">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Reward
               </Button>
@@ -409,6 +409,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Homework Pass"
+                  data-guide="reward-title"
                 />
               </div>
 
@@ -419,6 +420,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Skip one homework assignment"
+                  data-guide="reward-description"
                 />
               </div>
 
@@ -430,12 +432,13 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                   value={pointsCost}
                   onChange={(e) => setPointsCost(e.target.value)}
                   placeholder="50"
+                  data-guide="reward-points"
                 />
               </div>
 
               <div>
                 <Label>Category *</Label>
-                <div className="flex gap-2 mt-2 flex-wrap">
+                <div className="flex gap-2 mt-2 flex-wrap" data-guide="reward-category">
                   <Button
                     type="button"
                     variant={category === "tangible" ? "default" : "outline"}
@@ -530,7 +533,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
 
               <div>
                 <Label>Purchase Limit *</Label>
-                <div className="flex gap-2 mt-2 flex-wrap">
+                <div className="flex gap-2 mt-2 flex-wrap" data-guide="reward-purchase-limit">
                   <Button
                     type="button"
                     variant={purchaseLimitType === "once" ? "default" : "outline"}
@@ -587,6 +590,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                       setImagePreview("");
                     }
                   }}
+                  data-guide="reward-image"
                 />
                 {imagePreview && (
                   <img
@@ -599,7 +603,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
 
               <div>
                 <Label>Availability Period *</Label>
-                <div className="flex gap-2 mt-2 flex-wrap">
+                <div className="flex gap-2 mt-2 flex-wrap" data-guide="reward-availability">
                   <Button
                     type="button"
                     variant={availabilityType === "always" ? "default" : "outline"}
@@ -680,7 +684,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                 </div>
               )}
 
-              <Button onClick={handleSaveReward} className="w-full">
+              <Button onClick={handleSaveReward} className="w-full" data-guide="create-reward-submit">
                 {editingReward ? "Update Reward" : "Create Reward"}
               </Button>
             </div>

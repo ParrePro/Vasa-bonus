@@ -761,6 +761,7 @@ const TeacherClassView = () => {
                   className="w-full justify-between"
                   variant="outline"
                   onClick={() => givePoints(reason.points, reason.reason)}
+                  data-guide="submit-points"
                 >
                   <span>{reason.reason}</span>
                   <span className="font-bold text-primary">+{reason.points}</span>
@@ -788,6 +789,7 @@ const TeacherClassView = () => {
                         placeholder="Enter points amount"
                         value={customPoints}
                         onChange={(e) => setCustomPoints(e.target.value)}
+                        data-guide="points-input"
                       />
                     </div>
                     <div>
@@ -797,9 +799,10 @@ const TeacherClassView = () => {
                         placeholder="Enter reason for points"
                         value={customReason}
                         onChange={(e) => setCustomReason(e.target.value)}
+                        data-guide="points-note"
                       />
                     </div>
-                    <Button className="w-full" onClick={handleCustomPoints}>
+                    <Button className="w-full" onClick={handleCustomPoints} data-guide="submit-points">
                       Give Points
                     </Button>
                   </div>

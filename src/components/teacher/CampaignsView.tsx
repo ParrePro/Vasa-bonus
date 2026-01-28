@@ -376,7 +376,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button>
+              <Button data-guide="add-campaign-button">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Campaign
               </Button>
@@ -393,6 +393,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Book Club, Homework Challenge"
+                  data-guide="campaign-title"
                 />
               </div>
 
@@ -403,6 +404,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe the campaign..."
+                  data-guide="campaign-description"
                 />
               </div>
 
@@ -413,8 +415,8 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="multiplier">Points Multiplier</SelectItem>
-                    <SelectItem value="set_points">Set Points Reward</SelectItem>
+                    <SelectItem value="multiplier" data-guide="campaign-type-multiplier">Points Multiplier</SelectItem>
+                    <SelectItem value="set_points" data-guide="campaign-type-set">Set Points Reward</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -430,6 +432,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                     max="5"
                     value={multiplierValue}
                     onChange={(e) => setMultiplierValue(e.target.value)}
+                    data-guide="campaign-multiplier-input"
                   />
                   <p className="text-sm text-muted-foreground mt-1">
                     Students will earn {multiplierValue}x points while this campaign is active
@@ -446,6 +449,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                     min="1"
                     value={pointsValue}
                     onChange={(e) => setPointsValue(e.target.value)}
+                    data-guide="campaign-points-input"
                   />
                   <p className="text-sm text-muted-foreground mt-1">
                     Students will receive {pointsValue} points when confirmed
@@ -457,7 +461,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                 <div>
                   <Label htmlFor="durationType">Multiplier Duration</Label>
                   <Select value={durationType} onValueChange={(value: any) => setDurationType(value)}>
-                    <SelectTrigger>
+                    <SelectTrigger data-guide="campaign-duration">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -482,6 +486,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                     value={customDurationDays}
                     onChange={(e) => setCustomDurationDays(e.target.value)}
                     placeholder="30"
+                    data-guide="campaign-duration"
                   />
                 </div>
               )}
@@ -493,6 +498,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  data-guide="campaign-image"
                 />
               </div>
 
@@ -503,6 +509,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   type="datetime-local"
                   value={availableFrom}
                   onChange={(e) => setAvailableFrom(e.target.value)}
+                  data-guide="campaign-availability"
                 />
               </div>
 
@@ -513,13 +520,14 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   type="datetime-local"
                   value={availableUntil}
                   onChange={(e) => setAvailableUntil(e.target.value)}
+                  data-guide="campaign-availability"
                 />
               </div>
 
               <div>
                 <Label htmlFor="participation-limit">Participation Limit</Label>
                 <Select value={participationLimit} onValueChange={(v: "once" | "unlimited" | "custom") => setParticipationLimit(v)}>
-                  <SelectTrigger>
+                  <SelectTrigger data-guide="campaign-max-participations">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -540,6 +548,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                     value={customParticipationLimit}
                     onChange={(e) => setCustomParticipationLimit(e.target.value)}
                     placeholder="3"
+                    data-guide="campaign-max-participations"
                   />
                 </div>
               )}
@@ -570,7 +579,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                 </div>
               </div>
 
-              <Button onClick={handleSaveCampaign} className="w-full">
+              <Button onClick={handleSaveCampaign} className="w-full" data-guide="create-campaign-submit">
                 {editingCampaign ? 'Update Campaign' : 'Create Campaign'}
               </Button>
             </div>
