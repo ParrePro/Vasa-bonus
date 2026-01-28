@@ -36,6 +36,7 @@ const SmartGuideOverlay = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const location = useLocation();
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const hasInitialized = useRef(false);
 
   // Initialize position on mount
   useEffect(() => {
@@ -58,12 +59,15 @@ const SmartGuideOverlay = ({
       }
       
       setCurrentStep(initialStep);
+      hasInitialized.current = false; // Reset on open so we can initialize fresh
+    } else {
+      hasInitialized.current = false; // Reset when closed
     }
-  }, [isOpen, location.pathname, steps]);
+  }, [isOpen, steps, location.pathname]);
 
-  // Auto-advance based on navigation
+  // Auto-advance based on navigation (only after initialization is complete)
   useEffect(() => {
-    if (!isOpen || steps.length === 0) return;
+    if (!isOpen || steps.length === 0 || hasInitialized.current === false) return;
 
     const step = steps[currentStep];
     if (step.waitFor?.type === "navigation") {
@@ -139,6 +143,16 @@ const SmartGuideOverlay = ({
       return () => document.removeEventListener("guide-event", handleCustomEvent as EventListener);
     }
   }, [isOpen, currentStep, steps, onStepComplete, onGuideComplete, onClose]);
+
+  // Mark initialization as complete after mount
+  useEffect(() => {
+    if (isOpen && !hasInitialized.current) {
+      const timer = setTimeout(() => {
+        hasInitialized.current = true;
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
