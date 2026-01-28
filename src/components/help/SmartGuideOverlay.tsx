@@ -41,19 +41,9 @@ const SmartGuideOverlay = ({
   useEffect(() => {
     if (isOpen) {
       setPosition({ x: window.innerWidth / 2 - 200, y: window.innerHeight / 2 - 150 });
-      
-      // Smart step detection: if you're already on the right page, skip the navigation step
-      let initialStep = 0;
-      if (steps.length > 0 && steps[0].waitFor?.type === "navigation") {
-        const targetPath = steps[0].waitFor.value;
-        if (targetPath && location.pathname.includes(targetPath)) {
-          // Already on the right page, skip to next step
-          initialStep = 1;
-        }
-      }
-      setCurrentStep(initialStep);
+      setCurrentStep(0);
     }
-  }, [isOpen, steps, location.pathname]);
+  }, [isOpen]);
 
   // Auto-advance based on navigation
   useEffect(() => {

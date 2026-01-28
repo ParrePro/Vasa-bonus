@@ -5,7 +5,7 @@ export const givePointsSmartGuide: GuideStep[] = [
     id: "step-1",
     title: "📚 Welcome to Give Points Guide",
     instruction:
-      "Let's learn how to give points to your students. First, navigate to your classes by clicking 'My Classes' in the sidebar.",
+      "Let's learn how to give points to your students. Navigate to your classes and click on the class that contains the student you want to give points to.",
     waitFor: {
       type: "navigation",
       value: "/teacher/class/",
@@ -15,7 +15,7 @@ export const givePointsSmartGuide: GuideStep[] = [
     id: "step-2",
     title: "🎯 Select Your Student",
     instruction:
-      "Perfect! You're in the class. Now scroll down and find the student you want to give points to. Click on that student.",
+      "Great! You're in the class. Now scroll down and find the student you want to give points to. Click on that student.",
     waitFor: {
       type: "element-click",
       value: "[data-guide='student-select']",
@@ -23,29 +23,19 @@ export const givePointsSmartGuide: GuideStep[] = [
   },
   {
     id: "step-3",
-    title: "⭐ Choose a Reason",
+    title: "⭐ Give Points with a Reason",
     instruction:
-      "Excellent! Now you can see the student details. You can either click on one of the preset reasons (like preset point buttons) or click 'Custom Points' to enter your own amount and reason.",
-    waitFor: {
-      type: "element-click",
-      value: "[data-guide='submit-points'], [data-guide='custom-points-button']",
-    },
-  },
-  {
-    id: "step-4",
-    title: "✅ Confirm Points",
-    instruction:
-      "If you chose a preset reason, the points will be added immediately. If you chose custom, fill in the points and reason, then click 'Give Points'.",
+      "Perfect! Now you can see the student details. Click on a reason button (like 'Good Behavior', 'Great Assignment') or 'Custom Points' to give points. Clicking the reason will immediately award the points!",
     waitFor: {
       type: "event",
       value: "points-given",
     },
   },
   {
-    id: "step-5",
+    id: "step-4",
     title: "🎉 Success!",
     instruction:
-      "Congratulations! You've successfully given points to a student. The points are now added to their account. You can continue with other students or close this guide.",
+      "Congratulations! You've successfully given points to a student. The points are now added to their account. You can give points to more students or close this guide.",
     position: "center",
   },
 ];
