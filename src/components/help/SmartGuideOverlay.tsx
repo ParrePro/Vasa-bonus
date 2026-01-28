@@ -209,7 +209,7 @@ const SmartGuideOverlay = ({
       {/* Draggable Tooltip - Subtle helper card */}
       <Card
         ref={tooltipRef}
-        className="fixed z-50 p-4 max-w-xs shadow-sm border border-border/40 pointer-events-auto cursor-move bg-card/90 rounded-lg"
+        className="fixed z-[9999] p-4 max-w-xs shadow-sm border border-border/40 pointer-events-auto cursor-move bg-card/90 rounded-lg"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
