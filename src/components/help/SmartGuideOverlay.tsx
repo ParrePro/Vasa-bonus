@@ -94,6 +94,11 @@ const SmartGuideOverlay = ({
         const target = e.target as HTMLElement;
         const selector = step.waitFor?.value;
         
+        // Ignore clicks that originated from inside the guide card
+        if (tooltipRef.current && tooltipRef.current.contains(target)) {
+          return;
+        }
+        
         if (target.matches(selector!) || target.closest(selector!)) {
           // User clicked the right element
           if (currentStep < steps.length - 1) {
