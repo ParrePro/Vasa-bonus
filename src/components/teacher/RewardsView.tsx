@@ -395,7 +395,13 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Manage Rewards</h2>
         {canAddRewards && (
-          <Dialog open={dialogOpen}>
+          <Dialog open={dialogOpen} onOpenChange={(open) => {
+            // Always allow opening, but closing is only via the X button
+            if (open) {
+              setDialogOpen(true);
+            }
+            // For closing, the X button will handle it directly
+          }}>
             <DialogTrigger asChild>
               <Button data-guide="add-reward-button">
                 <Plus className="w-4 h-4 mr-2" />
