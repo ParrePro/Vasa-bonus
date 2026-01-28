@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Gift, Trash2, Edit, Clock, Calendar } from "lucide-react";
+import { Plus, Gift, Trash2, Edit, Clock, Calendar, X } from "lucide-react";
 
 interface RewardsViewProps {
   classId: string;
@@ -385,25 +385,28 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Manage Rewards</h2>
         {canAddRewards && (
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Don't close if the click originated from a guide button
-            if (!open && sessionStorage.getItem('guide-button-clicked') === 'true') {
-              return;
-            }
-            setDialogOpen(open);
-            if (!open) {
-              resetForm();
-            }
-          }}>
+          <Dialog open={dialogOpen}>
             <DialogTrigger asChild>
               <Button data-guide="add-reward-button">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Reward
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
             <DialogHeader>
-              <DialogTitle>{editingReward ? "Edit Reward" : "Create New Reward"}</DialogTitle>
+              <DialogTitle className="flex justify-between items-center">
+                <span>{editingReward ? "Edit Reward" : "Create New Reward"}</span>
+                <button
+                  onClick={() => {
+                    setDialogOpen(false);
+                    resetForm();
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Close dialog"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
