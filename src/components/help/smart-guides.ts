@@ -75,9 +75,10 @@ export const createRewardSmartGuide: GuideStep[] = [
     id: "step-4",
     title: "📝 Fill in Reward Details",
     instruction:
-      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs.",
+      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs. Then click on the category dropdown below to continue.",
     waitFor: {
-      type: "custom",
+      type: "element-click",
+      value: "[data-guide='reward-category']",
     },
   },
   {
@@ -94,9 +95,10 @@ export const createRewardSmartGuide: GuideStep[] = [
     id: "step-6",
     title: "🎨 Add Image (Optional)",
     instruction:
-      "You can upload an image to make the reward more appealing to students. This image will show in their rewards catalog.",
+      "You can upload an image to make the reward more appealing to students. This image will show in their rewards catalog. When ready, click on 'Set Purchase Limits' below to continue.",
     waitFor: {
-      type: "custom",
+      type: "element-click",
+      value: "[data-guide='reward-purchase-limit']",
     },
   },
   {
@@ -173,9 +175,10 @@ export const createCampaignSmartGuide: GuideStep[] = [
     id: "step-4",
     title: "📝 Campaign Title & Description",
     instruction:
-      "Fill in the campaign title (e.g., 'Reading Week', 'Homework Hero Challenge') and a description explaining what the campaign is about and why students should participate.",
+      "Fill in the campaign title (e.g., 'Reading Week', 'Homework Hero Challenge') and a description explaining what the campaign is about and why students should participate. Then click on 'Choose Campaign Type' below to continue.",
     waitFor: {
-      type: "custom",
+      type: "element-click",
+      value: "[data-guide='campaign-type-multiplier'], [data-guide='campaign-type-set']",
     },
   },
   {
@@ -232,9 +235,10 @@ export const createCampaignSmartGuide: GuideStep[] = [
     id: "step-10",
     title: "📅 Schedule Campaign (Optional)",
     instruction:
-      "You can set specific start and end dates for when the campaign runs. This lets you schedule campaigns in advance or have them start/stop automatically.",
+      "You can set specific start and end dates for when the campaign runs. This lets you schedule campaigns in advance or have them start/stop automatically. When ready, click on 'Add Campaign Image' below to continue.",
     waitFor: {
-      type: "custom",
+      type: "element-click",
+      value: "[data-guide='campaign-image']",
     },
   },
   {
