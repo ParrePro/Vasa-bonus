@@ -199,16 +199,16 @@ const SmartGuideOverlay = ({
 
   return (
     <>
-      {/* Non-blocking semi-transparent background */}
+      {/* Very subtle background overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/20 pointer-events-none"
+        className="fixed inset-0 z-40 bg-black/5 pointer-events-none"
         aria-label="Guide background"
       />
 
-      {/* Draggable Tooltip */}
+      {/* Draggable Tooltip - Subtle helper card */}
       <Card
         ref={tooltipRef}
-        className="fixed z-50 p-6 max-w-md shadow-2xl border-primary/50 pointer-events-auto cursor-move"
+        className="fixed z-50 p-5 max-w-sm shadow-md border border-border/50 pointer-events-auto cursor-move bg-card/95"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
@@ -220,71 +220,71 @@ const SmartGuideOverlay = ({
       >
         {/* Drag Handle */}
         <div
-          className="flex items-center gap-2 mb-4 pb-3 border-b cursor-grab active:cursor-grabbing"
+          className="flex items-center gap-2 mb-3 pb-2 border-b border-border/30 cursor-grab active:cursor-grabbing"
           onMouseDown={handleMouseDown}
         >
-          <GripHorizontal className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground font-semibold">Drag to move</span>
+          <GripHorizontal className="w-3 h-3 text-muted-foreground/50" />
+          <span className="text-xs text-muted-foreground/70">Helper</span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Header */}
-          <div className="flex justify-between items-start gap-4">
+          <div className="flex justify-between items-start gap-3">
             <div className="flex-1">
-              <h3 className="font-bold text-lg text-primary">{step.title}</h3>
-              <p className="text-sm text-foreground mt-2 leading-relaxed">
+              <h3 className="font-semibold text-base text-foreground">{step.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
                 {step.instruction}
               </p>
             </div>
             <button
               onClick={handleClose}
-              className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors flex-shrink-0"
               aria-label="Close guide"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Progress bar */}
           <div className="space-y-1">
-            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
               <div
-                className="h-full bg-primary transition-all duration-300"
+                className="h-full bg-primary/70 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground/60">
               Step {currentStep + 1} of {steps.length}
             </span>
           </div>
 
           {/* Help text */}
           {step.waitFor?.type === "element-click" && (
-            <p className="text-xs text-primary/80 italic">
+            <p className="text-xs text-muted-foreground italic">
               ✓ Guide will continue when you click on the element
             </p>
           )}
           {step.waitFor?.type === "navigation" && (
-            <p className="text-xs text-primary/80 italic">
+            <p className="text-xs text-muted-foreground italic">
               ✓ Guide will continue when you navigate
             </p>
           )}
           {step.waitFor?.type === "event" && (
-            <p className="text-xs text-primary/80 italic">
+            <p className="text-xs text-muted-foreground italic">
               ✓ Guide will continue when you complete the action
             </p>
           )}
 
           {/* Action buttons */}
           {(!step.waitFor || step.waitFor.type === "custom") && (
-            <Button onClick={handleNext} className="w-full">
+            <Button onClick={handleNext} size="sm" className="w-full mt-2">
               {isLastStep ? (
                 <>
-                  Done <ChevronRight className="w-4 h-4 ml-1" />
+                  Done <ChevronRight className="w-3 h-3 ml-1" />
                 </>
               ) : (
                 <>
-                  Next <ChevronRight className="w-4 h-4 ml-1" />
+                  Next <ChevronRight className="w-3 h-3 ml-1" />
                 </>
               )}
             </Button>
