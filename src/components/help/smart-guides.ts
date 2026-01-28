@@ -75,9 +75,10 @@ export const createRewardSmartGuide: GuideStep[] = [
     id: "step-4",
     title: "📝 Fill in Reward Details",
     instruction:
-      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs. Then click 'Next' to continue.",
+      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs. The guide will advance automatically when all three fields are filled.",
     waitFor: {
-      type: "custom",
+      type: "event",
+      value: "reward-details-filled",
     },
   },
   {

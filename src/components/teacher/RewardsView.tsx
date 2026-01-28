@@ -47,6 +47,16 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     loadClasses();
   }, [classId]);
 
+  // Dispatch event when reward details are filled for guide progression
+  useEffect(() => {
+    if (title.trim() && description.trim() && pointsCost.trim()) {
+      const event = new CustomEvent('guide-event', {
+        detail: { action: 'reward-details-filled' }
+      });
+      document.dispatchEvent(event);
+    }
+  }, [title, description, pointsCost]);
+
   const loadRewards = async () => {
     try {
       const { data: rewardClassData, error: rcError } = await supabase
