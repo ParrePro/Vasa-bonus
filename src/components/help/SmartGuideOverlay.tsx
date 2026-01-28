@@ -184,6 +184,9 @@ const SmartGuideOverlay = ({
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    // Mark that a guide button was clicked to prevent dialog closure
+    sessionStorage.setItem('guide-button-clicked', 'true');
+    setTimeout(() => sessionStorage.removeItem('guide-button-clicked'), 100);
     handleNext();
   };
 

@@ -387,7 +387,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
         {canAddRewards && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
             // Don't close if the click originated from a guide button
-            if (!open && document.activeElement?.getAttribute('data-guide-button') === 'true') {
+            if (!open && sessionStorage.getItem('guide-button-clicked') === 'true') {
               return;
             }
             setDialogOpen(open);
