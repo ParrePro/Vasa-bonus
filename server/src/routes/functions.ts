@@ -162,14 +162,20 @@ router.post('/join-campaign', authMiddleware, async (req: AuthRequest, res) => {
 
     const campaign = campaignResult.rows[0];
 
-    // Check if already participating
-    const existingResult = await query(
-      'SELECT id FROM campaign_participations WHERE campaign_id = $1 AND student_id = $2',
-      [campaignId, userId]
-    );
-
-    if (existingResult.rows.length > 0) {
-      return res.status(400).json({ success: false, error: 'Already participating in this campaign' });
+    // Check participation limits - only restrict if max_participations is set (not null)
+    if (campaign.max_participations !== null) {
+      // Count existing participations for this student in this campaign
+      const participationCountResult = await query(
+        'SELECT COUNT(*) as count FROM campaign_participations WHERE campaign_id = $1 AND student_id = $2',
+        [campaignId, userId]
+      );
+      
+      const participationCount = parseInt(participationCountResult.rows[0].count);
+      
+      // Check if they've already hit the limit
+      if (participationCount >= campaign.max_participations) {
+        return res.status(400).json({ success: false, error: 'Already participating in this campaign' });
+      }
     }
 
     // Create the participation record
