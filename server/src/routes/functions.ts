@@ -203,7 +203,7 @@ router.post('/join-campaign', authMiddleware, async (req: AuthRequest, res) => {
     // Get teachers in this class who have permission to fulfill campaigns
     // Mentors always have permission, co-teachers need can_fulfill_campaigns = true
     const teachersResult = await query(
-      `SELECT cm.user_id, au.email, cm.receive_email_notifications
+      `SELECT cm.user_id, au.email
        FROM class_members cm 
        JOIN auth_users au ON au.id = cm.user_id 
        JOIN classes c ON c.id = cm.class_id
@@ -220,8 +220,8 @@ router.post('/join-campaign', authMiddleware, async (req: AuthRequest, res) => {
         [classId, teacher.user_id, userId, `${studentName} wants to join the campaign: ${campaign.title}`, 'campaign_request', participationId]
       );
 
-      // Send email notification to teacher if they have email notifications enabled
-      if (teacher.email && (teacher.receive_email_notifications === true || teacher.receive_email_notifications === null)) {
+      // Send email notification to teacher
+      if (teacher.email) {
         const emailContent = getCampaignRequestEmail(studentName, campaign.title, className);
         sendEmail({
           to: teacher.email,
