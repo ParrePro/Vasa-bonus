@@ -191,13 +191,18 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
     return count < campaign.max_participations;
   };
 
+  const hasReachedLimit = (campaign: Campaign) => {
+    if (campaign.max_participations === null) return false;
+    return getParticipationCount(campaign.id) >= campaign.max_participations;
+  };
+
   const availableCampaigns = campaigns.filter(c => {
     const participation = getParticipationStatus(c.id);
     const hasActiveOrPending = participations.some(
       p => p.campaign_id === c.id && (p.status === 'pending' || (p.status === 'active' && !isExpired(p)))
     );
-    // Show if can join and doesn't have an active/pending participation
-    return canJoinCampaign(c) && !hasActiveOrPending;
+    // Show if doesn't have an active/pending participation (show even if limit is reached)
+    return !hasActiveOrPending;
   });
 
   const activeCampaigns = campaigns.filter(c => {
@@ -214,15 +219,6 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
   const completedCampaigns = campaigns.filter(c => {
     const participation = getParticipationStatus(c.id);
     return participation?.status === 'completed';
-  });
-
-  const unavailableCampaigns = campaigns.filter(c => {
-    const participation = getParticipationStatus(c.id);
-    const hasActiveOrPending = participations.some(
-      p => p.campaign_id === c.id && (p.status === 'pending' || (p.status === 'active' && !isExpired(p)))
-    );
-    // Show if limit is reached and no active/pending participation
-    return !canJoinCampaign(c) && !hasActiveOrPending && !participation;
   });
 
   return (
@@ -380,55 +376,6 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
         </div>
       )}
 
-      {unavailableCampaigns.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Unavailable Campaigns</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {unavailableCampaigns.map((campaign) => (
-              <Card key={campaign.id} className="overflow-hidden opacity-50">
-                {campaign.image_url && (
-                  <div className="h-48 overflow-hidden grayscale">
-                    <img 
-                      src={campaign.image_url} 
-                      alt={campaign.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-xl">{campaign.title}</CardTitle>
-                    <Badge variant="outline" className="text-muted-foreground">
-                      Unavailable
-                    </Badge>
-                  </div>
-                  <CardDescription>{campaign.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {campaign.campaign_type === 'multiplier' && (
-                      <Badge className="bg-gradient-to-r from-primary to-primary-glow text-white font-semibold shadow-sm">
-                        <Zap className="w-3 h-3 mr-1" />
-                        {campaign.multiplier_value}x Points Multiplier
-                      </Badge>
-                    )}
-                    {campaign.campaign_type === 'set_points' && (
-                      <Badge className="bg-gradient-to-r from-secondary to-primary text-white font-semibold shadow-sm">
-                        <Trophy className="w-3 h-3 mr-1" />
-                        {campaign.points_value} Points Reward
-                      </Badge>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      You have reached the maximum participation limit ({campaign.max_participations}) for this campaign
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div>
         <h2 className="text-2xl font-bold mb-4">Available Campaigns</h2>
         {availableCampaigns.length === 0 ? (
@@ -496,20 +443,26 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
                         </div>
                       )}
                     </div>
-                    <Button 
-                      className="w-full"
-                      onClick={() => handleJoinCampaign(campaign.id)}
-                      disabled={joiningId === campaign.id}
-                    >
-                      {joiningId === campaign.id ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Joining...
-                        </>
-                      ) : (
-                        'Join Campaign'
-                      )}
-                    </Button>
+                    {hasReachedLimit(campaign) ? (
+                      <div className="w-full p-2 bg-muted rounded text-center text-sm font-medium text-muted-foreground">
+                        Maximum participation limit reached
+                      </div>
+                    ) : (
+                      <Button 
+                        className="w-full"
+                        onClick={() => handleJoinCampaign(campaign.id)}
+                        disabled={joiningId === campaign.id}
+                      >
+                        {joiningId === campaign.id ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Joining...
+                          </>
+                        ) : (
+                          'Join Campaign'
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
