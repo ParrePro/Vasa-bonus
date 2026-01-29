@@ -143,12 +143,6 @@ export const createRewardSmartGuide: GuideStep[] = [
     position: "center",
   },
 ];
-    title: "🎉 Reward Created!",
-    instruction:
-      "Excellent! Your reward is now live. Students can see it in their rewards catalog and start earning points to redeem it.",
-    position: "center",
-  },
-];
 
 export const createCampaignSmartGuide: GuideStep[] = [
   {
