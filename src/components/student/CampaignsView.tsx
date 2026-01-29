@@ -174,7 +174,21 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
   };
 
   const getParticipationStatus = (campaignId: string) => {
-    return participations.find(p => p.campaign_id === campaignId);
+    // Get all participations for this campaign
+    const campaignParticipations = participations.filter(p => p.campaign_id === campaignId);
+    
+    if (campaignParticipations.length === 0) return undefined;
+    
+    // Prioritize: pending > active > completed
+    // This ensures we show the most recent active/pending participation even if there are completed ones
+    const pending = campaignParticipations.find(p => p.status === 'pending');
+    if (pending) return pending;
+    
+    const active = campaignParticipations.find(p => p.status === 'active');
+    if (active) return active;
+    
+    // Return the last completed one (most recent)
+    return campaignParticipations[campaignParticipations.length - 1];
   };
 
   const getParticipationCount = (campaignId: string) => {
