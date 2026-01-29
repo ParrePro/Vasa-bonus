@@ -73,66 +73,76 @@ export const createRewardSmartGuide: GuideStep[] = [
   },
   {
     id: "step-4",
-    title: "📝 Fill in Reward Details",
+    title: "📝 Fill in Reward Basics",
     instruction:
-      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs. The guide will advance automatically when all three fields are filled.",
+      "A form will appear. Fill in the reward title (e.g., 'Homework Pass', 'Extra Recess Time'), description (what it includes), and how many points it costs. Then click 'Next' to continue.",
     waitFor: {
-      type: "event",
-      value: "reward-details-filled",
+      type: "custom",
     },
   },
   {
     id: "step-5",
-    title: "🏷️ Choose a Category",
+    title: "🏷️ Choose Reward Category",
     instruction:
-      "Select a category: Tangible (physical items), Symbolic (certificates/badges), or Privilege (special activities). This helps organize rewards for students. The guide will advance automatically when you select a category.",
+      "Select which type of reward this is:\n\n🎁 Tangible: Physical items students get once and keep forever (sticker, pencil, certificate to take home)\n\n🎟️ One-Time Privilege: Something students get once and can use/claim later (leave school early, borrow something special, skip homework once)\n\n✨ Symbolic: No teacher action needed - students get an automatic privilege for a longer period (extra points tomorrow, special role for a week, access to something special)",
     waitFor: {
-      type: "event",
-      value: "reward-category-selected",
+      type: "custom",
     },
   },
   {
     id: "step-6",
-    title: "🎨 Add Image (Optional)",
+    title: "⏳ Reward Duration Type",
     instruction:
-      "You can upload an image to make the reward more appealing to students. This image will show in their rewards catalog. The guide will advance automatically when you select an image, or you can skip this step.",
+      "Choose how long this reward benefit lasts:\n\n📅 Short-term: Reward is good for a brief period\n📆 Long-term: Reward is good for an extended period",
     waitFor: {
-      type: "event",
-      value: "reward-image-selected",
+      type: "custom",
     },
   },
   {
     id: "step-7",
     title: "🔄 Set Purchase Limits",
     instruction:
-      "Choose how many times students can get this reward: 'Once' (limited supply), 'Unlimited' (always available), or 'Custom' (set a specific number). The guide will advance when you make a selection.",
+      "Choose how many times students can purchase this reward:\n\n• Once: Limited supply - students can only get this reward once\n• Unlimited: Always available - students can get it multiple times\n• Custom: Set a specific number (e.g., 3 times maximum per student)",
     waitFor: {
-      type: "event",
-      value: "reward-purchase-limit-selected",
+      type: "custom",
     },
   },
   {
     id: "step-8",
-    title: "📅 Set Availability",
+    title: "🎨 Add Image (Optional)",
     instruction:
-      "Decide if the reward is available all year or for a limited time. The guide will advance when you make a selection.",
+      "You can upload an image to make the reward more appealing and exciting for students. This image will show in their rewards catalog. Click 'Next' when ready to continue (this step is optional).",
     waitFor: {
-      type: "event",
-      value: "reward-availability-selected",
+      type: "custom",
     },
   },
   {
     id: "step-9",
-    title: "✅ Create the Reward",
+    title: "📅 Set Availability Period",
     instruction:
-      "Click 'Create Reward' to save it. Your reward is now available for students to redeem with their points!",
+      "Choose when this reward is visible and available to students:\n\n• Always Available: Reward is shown to students at all times\n• Limited Time: Set specific dates when the reward is available\n• Schedule for Later: Set dates in advance so the reward shows up automatically on specific dates",
     waitFor: {
-      type: "event",
-      value: "reward-created",
+      type: "custom",
     },
   },
   {
     id: "step-10",
+    title: "🎯 Add to Multiple Classes (Optional)",
+    instruction:
+      "You can optionally add this same reward to other classes. This saves time if you use the same rewards across multiple classes. Then click 'Create Reward' to finish!",
+    waitFor: {
+      type: "element-click",
+      value: "[data-guide='create-reward-submit']",
+    },
+  },
+  {
+    id: "step-11",
+    title: "🎉 Reward Created!",
+    instruction:
+      "Excellent! Your reward is now live. Students can see it in their rewards catalog and start earning points to redeem it.",
+    position: "center",
+  },
+];
     title: "🎉 Reward Created!",
     instruction:
       "Excellent! Your reward is now live. Students can see it in their rewards catalog and start earning points to redeem it.",

@@ -453,18 +453,8 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
             </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
             <DialogHeader>
-              <DialogTitle className="flex justify-between items-center">
-                <span>{editingReward ? "Edit Reward" : "Create New Reward"}</span>
-                <button
-                  onClick={() => {
-                    setDialogOpen(false);
-                    resetForm();
-                  }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Close dialog"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <DialogTitle>
+                {editingReward ? "Edit Reward" : "Create New Reward"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
