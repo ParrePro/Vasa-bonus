@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +25,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClasses, setSelectedClasses] = useState<string[]>([classId]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const guideButtonClickedRef = useRef(false);
   const [editingReward, setEditingReward] = useState<any | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -46,6 +47,17 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     loadRewards();
     loadClasses();
   }, [classId]);
+
+  // Listen for guide button click events
+  useEffect(() => {
+    const handleGuideButtonClick = () => {
+      guideButtonClickedRef.current = true;
+    };
+    window.addEventListener('guide-button-clicked', handleGuideButtonClick);
+    return () => {
+      window.removeEventListener('guide-button-clicked', handleGuideButtonClick);
+    };
+  }, []);
 
   // Dispatch event when reward details are filled for guide progression
   useEffect(() => {
@@ -439,11 +451,15 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
         <h2 className="text-2xl font-bold">Manage Rewards</h2>
         {canAddRewards && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Always allow opening, but closing is only via the X button
+            // Don't close if the click originated from a guide button
+            if (!open && guideButtonClickedRef.current) {
+              guideButtonClickedRef.current = false;
+              return;
+            }
+            // Always allow opening
             if (open) {
               setDialogOpen(true);
             }
-            // For closing, the X button will handle it directly
           }}>
             <DialogTrigger asChild>
               <Button data-guide="add-reward-button">

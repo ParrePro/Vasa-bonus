@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
   const [availableUntil, setAvailableUntil] = useState("");
   const [participationLimit, setParticipationLimit] = useState<"once" | "unlimited" | "custom">("unlimited");
   const [customParticipationLimit, setCustomParticipationLimit] = useState("3");
+  const guideButtonClickedRef = useRef(false);
 
   const { toast } = useToast();
 
@@ -58,6 +59,17 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
     loadCampaigns();
     loadAllClasses();
   }, [classId]);
+
+  // Listen for guide button click events
+  useEffect(() => {
+    const handleGuideButtonClick = () => {
+      guideButtonClickedRef.current = true;
+    };
+    window.addEventListener('guide-button-clicked', handleGuideButtonClick);
+    return () => {
+      window.removeEventListener('guide-button-clicked', handleGuideButtonClick);
+    };
+  }, []);
 
   const loadAllClasses = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -372,8 +384,9 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
         <h2 className="text-2xl font-bold">Campaigns</h2>
         {canAddCampaigns && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Don't close if the click originated from a guide button
-            if (!open && document.activeElement?.getAttribute('data-guide-button') === 'true') {
+            // Don't close if guide button triggered this
+            if (!open && guideButtonClickedRef.current) {
+              guideButtonClickedRef.current = false;
               return;
             }
             setDialogOpen(open);

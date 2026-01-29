@@ -184,6 +184,8 @@ const SmartGuideOverlay = ({
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    // Dispatch event to notify components that guide button was clicked
+    window.dispatchEvent(new CustomEvent('guide-button-clicked'));
     handleNext();
   };
 
