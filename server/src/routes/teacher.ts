@@ -42,7 +42,7 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
     const userId = req.user?.id;
     const { settings } = req.body;
 
-    console.log('Saving email settings for user:', userId, 'Settings:', settings);
+    console.log('Saving email settings for user:', userId, 'Settings:', JSON.stringify(settings));
 
     if (!userId) {
       return res.status(401).json({ error: 'Not authenticated' });
@@ -53,42 +53,78 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
       return res.status(400).json({ error: 'Invalid settings format' });
     }
 
-    // Update email notification preference for each class
-    for (const setting of settings) {
-      const { classId, receiveNotifications } = setting;
-      
-      // Ensure receiveNotifications is a boolean
-      const notificationStatus = Boolean(receiveNotifications);
-      
-      console.log(`Updating settings for class ${classId}: receiveNotifications = ${notificationStatus}`);
-
-      // Verify that the user is a teacher in this class
-      const verifyResult = await query(
-        `SELECT id FROM class_members 
-         WHERE user_id = $1 AND class_id = $2 AND is_teacher = TRUE`,
-        [userId, classId]
-      );
-
-      if (verifyResult.rows.length === 0) {
-        console.warn(`User ${userId} is not a teacher in class ${classId}, skipping`);
-        continue; // Skip if user is not a teacher in this class
-      }
-
-      // Update the email notification preference
-      const updateResult = await query(
-        `UPDATE class_members 
-         SET receive_email_notifications = $1 
-         WHERE user_id = $2 AND class_id = $3`,
-        [notificationStatus, userId, classId]
-      );
-      
-      console.log(`Updated class ${classId} for user ${userId}`);
+    if (settings.length === 0) {
+      return res.status(400).json({ error: 'No settings provided' });
     }
 
-    res.json({ success: true, message: 'Email settings saved' });
+    let updateCount = 0;
+    const errors: string[] = [];
+
+    // Update email notification preference for each class
+    for (const setting of settings) {
+      try {
+        const { classId, receiveNotifications } = setting;
+        
+        if (!classId) {
+          errors.push('Missing classId in setting');
+          continue;
+        }
+        
+        // Ensure receiveNotifications is a boolean - handle string values
+        let notificationStatus: boolean;
+        if (typeof receiveNotifications === 'string') {
+          notificationStatus = receiveNotifications.toLowerCase() === 'true';
+        } else {
+          notificationStatus = Boolean(receiveNotifications);
+        }
+        
+        console.log(`Updating settings for class ${classId}: receiveNotifications = ${notificationStatus}`);
+
+        // Verify that the user is a teacher in this class
+        const verifyResult = await query(
+          `SELECT id FROM class_members 
+           WHERE user_id = $1 AND class_id = $2 AND is_teacher = TRUE`,
+          [userId, classId]
+        );
+
+        if (verifyResult.rows.length === 0) {
+          console.warn(`User ${userId} is not a teacher in class ${classId}, skipping`);
+          continue; // Skip if user is not a teacher in this class
+        }
+
+        // Update the email notification preference
+        await query(
+          `UPDATE class_members 
+           SET receive_email_notifications = $1 
+           WHERE user_id = $2 AND class_id = $3`,
+          [notificationStatus, userId, classId]
+        );
+        
+        updateCount++;
+        console.log(`Updated class ${classId} for user ${userId}`);
+      } catch (loopError: any) {
+        const errorMsg = `Error updating class: ${loopError.message}`;
+        console.error(errorMsg);
+        errors.push(errorMsg);
+      }
+    }
+
+    if (updateCount === 0 && errors.length > 0) {
+      return res.status(400).json({ error: 'Failed to update settings', details: errors });
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Email settings saved (${updateCount} classes updated)`,
+      errors: errors.length > 0 ? errors : undefined
+    });
   } catch (error: any) {
     console.error('Error saving email settings:', error);
-    res.status(500).json({ error: 'Failed to save email settings', details: error.message });
+    res.status(500).json({ 
+      error: 'Failed to save email settings', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
