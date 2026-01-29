@@ -57,7 +57,10 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
     for (const setting of settings) {
       const { classId, receiveNotifications } = setting;
       
-      console.log(`Updating settings for class ${classId}: receiveNotifications = ${receiveNotifications}`);
+      // Ensure receiveNotifications is a boolean
+      const notificationStatus = Boolean(receiveNotifications);
+      
+      console.log(`Updating settings for class ${classId}: receiveNotifications = ${notificationStatus}`);
 
       // Verify that the user is a teacher in this class
       const verifyResult = await query(
@@ -76,7 +79,7 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
         `UPDATE class_members 
          SET receive_email_notifications = $1 
          WHERE user_id = $2 AND class_id = $3`,
-        [receiveNotifications, userId, classId]
+        [notificationStatus, userId, classId]
       );
       
       console.log(`Updated class ${classId} for user ${userId}`);

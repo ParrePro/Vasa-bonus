@@ -167,6 +167,8 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
     });
 
     // Reload both campaigns and participations to show pending status
+    // Add a small delay to ensure database is updated
+    await new Promise(resolve => setTimeout(resolve, 500));
     loadCampaigns();
     loadParticipations();
   };
