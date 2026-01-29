@@ -166,6 +166,8 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
       description: "Your teacher will confirm your participation",
     });
 
+    // Reload both campaigns and participations to show pending status
+    loadCampaigns();
     loadParticipations();
   };
 
