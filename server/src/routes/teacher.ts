@@ -14,8 +14,8 @@ router.get('/email-settings', authMiddleware, async (req: AuthRequest, res) => {
 
     // Get all classes where the user is a teacher and their email settings
     const result = await query(
-      `SELECT cm.class_id as classId, c.name as className, 
-              COALESCE(cm.receive_email_notifications, TRUE) as receiveNotifications
+      `SELECT cm.class_id, c.name, 
+              COALESCE(cm.receive_email_notifications, TRUE) as receive_email_notifications
        FROM class_members cm
        JOIN classes c ON c.id = cm.class_id
        WHERE cm.user_id = $1 AND cm.is_teacher = TRUE
@@ -24,9 +24,9 @@ router.get('/email-settings', authMiddleware, async (req: AuthRequest, res) => {
     );
 
     const settings = result.rows.map((row: any) => ({
-      classId: row.classid,
-      className: row.classname,
-      receiveNotifications: row.receivenotifications,
+      classId: row.class_id,
+      className: row.name,
+      receiveNotifications: row.receive_email_notifications,
     }));
 
     res.json(settings);
