@@ -211,6 +211,20 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
     return participation?.status === 'pending';
   });
 
+  const completedCampaigns = campaigns.filter(c => {
+    const participation = getParticipationStatus(c.id);
+    return participation?.status === 'completed';
+  });
+
+  const unavailableCampaigns = campaigns.filter(c => {
+    const participation = getParticipationStatus(c.id);
+    const hasActiveOrPending = participations.some(
+      p => p.campaign_id === c.id && (p.status === 'pending' || (p.status === 'active' && !isExpired(p)))
+    );
+    // Show if limit is reached and no active/pending participation
+    return !canJoinCampaign(c) && !hasActiveOrPending && !participation;
+  });
+
   return (
     <div className="space-y-8">
       {activeCampaigns.length > 0 && (
@@ -313,6 +327,100 @@ const CampaignsView = ({ classId }: CampaignsViewProps) => {
                         {campaign.points_value} Points Reward
                       </Badge>
                     )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {completedCampaigns.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Completed Campaigns</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {completedCampaigns.map((campaign) => (
+              <Card key={campaign.id} className="overflow-hidden opacity-60">
+                {campaign.image_url && (
+                  <div className="h-48 overflow-hidden grayscale">
+                    <img 
+                      src={campaign.image_url} 
+                      alt={campaign.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-xl">{campaign.title}</CardTitle>
+                    <Badge className="bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold shadow-sm">
+                      Completed
+                    </Badge>
+                  </div>
+                  <CardDescription>{campaign.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {campaign.campaign_type === 'set_points' && (
+                      <>
+                        <Badge className="bg-gradient-to-r from-secondary to-primary text-white font-semibold shadow-sm">
+                          <Trophy className="w-3 h-3 mr-1" />
+                          {campaign.points_value} Points Reward
+                        </Badge>
+                        <p className="text-sm text-muted-foreground">
+                          ✓ You've already received the reward for this campaign
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {unavailableCampaigns.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Unavailable Campaigns</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {unavailableCampaigns.map((campaign) => (
+              <Card key={campaign.id} className="overflow-hidden opacity-50">
+                {campaign.image_url && (
+                  <div className="h-48 overflow-hidden grayscale">
+                    <img 
+                      src={campaign.image_url} 
+                      alt={campaign.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-xl">{campaign.title}</CardTitle>
+                    <Badge variant="outline" className="text-muted-foreground">
+                      Unavailable
+                    </Badge>
+                  </div>
+                  <CardDescription>{campaign.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {campaign.campaign_type === 'multiplier' && (
+                      <Badge className="bg-gradient-to-r from-primary to-primary-glow text-white font-semibold shadow-sm">
+                        <Zap className="w-3 h-3 mr-1" />
+                        {campaign.multiplier_value}x Points Multiplier
+                      </Badge>
+                    )}
+                    {campaign.campaign_type === 'set_points' && (
+                      <Badge className="bg-gradient-to-r from-secondary to-primary text-white font-semibold shadow-sm">
+                        <Trophy className="w-3 h-3 mr-1" />
+                        {campaign.points_value} Points Reward
+                      </Badge>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      You have reached the maximum participation limit ({campaign.max_participations}) for this campaign
+                    </p>
                   </div>
                 </CardContent>
               </Card>

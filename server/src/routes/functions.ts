@@ -376,7 +376,9 @@ router.post('/confirm-campaign', authMiddleware, async (req: AuthRequest, res) =
     }
 
     // Update participation status
-    const newStatus = 'active';
+    // For set_points campaigns, mark as completed immediately since they're one-time rewards
+    // For multiplier campaigns, mark as active so they can be used over their duration
+    const newStatus = actualCampaignType === 'set_points' ? 'completed' : 'active';
     await query(
       `UPDATE campaign_participations 
        SET status = $1, confirmed_at = NOW(), confirmed_by = $2, expires_at = $3 
