@@ -81,8 +81,11 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
       
       try {
         setLoadingTeachers(true);
+        const { data: session } = await supabase.auth.getSession();
+        const accessToken = session?.access_token || '';
+
         const { getTeachersFromClasses } = await import("../../lib/teacher-selection");
-        const teachers = await getTeachersFromClasses(selectedClasses, '');
+        const teachers = await getTeachersFromClasses(selectedClasses, accessToken);
         setAllTeachers(teachers);
         // Pre-select all teachers by default
         setSelectedTeachers(new Set(teachers.map(t => t.id)));

@@ -323,6 +323,44 @@ router.delete('/:classId', authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
+// Get teachers for one or more classes (for teacher selection in rewards/campaigns)
+router.post('/get-teachers', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { classIds } = req.body;
+
+    if (!classIds || !Array.isArray(classIds) || classIds.length === 0) {
+      return res.status(400).json({ error: 'classIds array is required' });
+    }
+
+    // Get unique teachers from the specified classes
+    const placeholders = classIds.map((_, i) => `$${i + 1}`).join(',');
+    const result = await query(
+      `SELECT DISTINCT 
+        cm.user_id,
+        p.name,
+        au.email
+       FROM class_members cm
+       JOIN profiles p ON cm.user_id = p.id
+       JOIN auth_users au ON cm.user_id = au.id
+       WHERE cm.class_id IN (${placeholders}) 
+         AND cm.is_teacher = true
+       ORDER BY p.name ASC`,
+      classIds
+    );
+
+    const teachers = result.rows.map(row => ({
+      id: row.user_id,
+      name: row.name,
+      email: row.email,
+    }));
+
+    res.json(teachers);
+  } catch (error) {
+    console.error('Get teachers error:', error);
+    res.status(500).json({ error: 'Failed to get teachers' });
+  }
+});
+
 // Get teacher permissions for a class
 router.get('/:classId/teachers', authMiddleware, async (req: AuthRequest, res) => {
   try {
