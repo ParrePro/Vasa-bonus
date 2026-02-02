@@ -37,6 +37,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [campaignStep, setCampaignStep] = useState(1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [campaignType, setCampaignType] = useState<'multiplier' | 'set_points'>('multiplier');
@@ -158,6 +159,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
     setParticipationLimit("unlimited");
     setCustomParticipationLimit("3");
     setEditingCampaign(null);
+    setCampaignStep(1);
   };
 
   const handleSaveCampaign = async () => {
@@ -401,204 +403,279 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}</DialogTitle>
+              <div className="text-sm text-muted-foreground mt-2">Step {campaignStep} of 3</div>
             </DialogHeader>
+            
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Campaign Title</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Book Club, Homework Challenge"
-                  data-guide="campaign-title"
-                />
-              </div>
+              {/* STEP 1: Title & Description */}
+              {campaignStep === 1 && (
+                <>
+                  <div>
+                    <Label htmlFor="title">Campaign Title</Label>
+                    <Input
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="e.g., Book Club, Homework Challenge"
+                      data-guide="campaign-title"
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe the campaign..."
-                  data-guide="campaign-description"
-                />
-              </div>
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe the campaign..."
+                      data-guide="campaign-description"
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="campaign-type">Campaign Type</Label>
-                <Select value={campaignType} onValueChange={(value: 'multiplier' | 'set_points') => setCampaignType(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="multiplier" data-guide="campaign-type-multiplier">Points Multiplier</SelectItem>
-                    <SelectItem value="set_points" data-guide="campaign-type-set">Set Points Reward</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {campaignType === 'multiplier' && (
-                <div>
-                  <Label htmlFor="multiplier">Multiplier Value</Label>
-                  <Input
-                    id="multiplier"
-                    type="number"
-                    step="0.1"
-                    min="1"
-                    max="5"
-                    value={multiplierValue}
-                    onChange={(e) => setMultiplierValue(e.target.value)}
-                    data-guide="campaign-multiplier-input"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Students will earn {multiplierValue}x points while this campaign is active
-                  </p>
-                </div>
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setDialogOpen(false);
+                        resetForm();
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        if (!title.trim() || !description.trim()) {
+                          toast({
+                            title: "Error",
+                            description: "Please fill in title and description",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setCampaignStep(2);
+                      }}
+                      className="flex-1"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
               )}
 
-              {campaignType === 'set_points' && (
-                <div>
-                  <Label htmlFor="points">Points Reward</Label>
-                  <Input
-                    id="points"
-                    type="number"
-                    min="1"
-                    value={pointsValue}
-                    onChange={(e) => setPointsValue(e.target.value)}
-                    data-guide="campaign-points-input"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Students will receive {pointsValue} points when confirmed
-                  </p>
-                </div>
-              )}
+              {/* STEP 2: Campaign Type & Duration */}
+              {campaignStep === 2 && (
+                <>
+                  <div>
+                    <Label htmlFor="campaign-type">Campaign Type</Label>
+                    <Select value={campaignType} onValueChange={(value: 'multiplier' | 'set_points') => setCampaignType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="multiplier" data-guide="campaign-type-multiplier">Points Multiplier</SelectItem>
+                        <SelectItem value="set_points" data-guide="campaign-type-set">Set Points Reward</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {campaignType === 'multiplier' && (
-                <div>
-                  <Label htmlFor="durationType">Multiplier Duration</Label>
-                  <Select value={durationType} onValueChange={(value: any) => setDurationType(value)}>
-                    <SelectTrigger data-guide="campaign-duration">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2_minutes">2 Minutes (Test)</SelectItem>
-                      <SelectItem value="1_week">1 Week</SelectItem>
-                      <SelectItem value="1_month">1 Month</SelectItem>
-                      <SelectItem value="1_year">1 Year</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                      <SelectItem value="unlimited">Unlimited</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {campaignType === 'multiplier' && durationType === 'custom' && (
-                <div>
-                  <Label htmlFor="customDurationDays">Duration (Days)</Label>
-                  <Input
-                    id="customDurationDays"
-                    type="number"
-                    min="1"
-                    value={customDurationDays}
-                    onChange={(e) => setCustomDurationDays(e.target.value)}
-                    placeholder="30"
-                    data-guide="campaign-duration"
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="image">Campaign Image</Label>
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                  data-guide="campaign-image"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="available-from">Available From (Optional)</Label>
-                <Input
-                  id="available-from"
-                  type="datetime-local"
-                  value={availableFrom}
-                  onChange={(e) => setAvailableFrom(e.target.value)}
-                  data-guide="campaign-availability"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="available-until">Available Until (Optional)</Label>
-                <Input
-                  id="available-until"
-                  type="datetime-local"
-                  value={availableUntil}
-                  onChange={(e) => setAvailableUntil(e.target.value)}
-                  data-guide="campaign-availability"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="participation-limit">Participation Limit</Label>
-                <Select value={participationLimit} onValueChange={(v: "once" | "unlimited" | "custom") => setParticipationLimit(v)}>
-                  <SelectTrigger data-guide="campaign-max-participations">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="once">Once per student</SelectItem>
-                    <SelectItem value="unlimited">Unlimited</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {participationLimit === 'custom' && (
-                <div>
-                  <Label htmlFor="custom-limit">Maximum Participations</Label>
-                  <Input
-                    id="custom-limit"
-                    type="number"
-                    min="1"
-                    value={customParticipationLimit}
-                    onChange={(e) => setCustomParticipationLimit(e.target.value)}
-                    placeholder="3"
-                    data-guide="campaign-max-participations"
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label>Post to Classes</Label>
-                <div className="border rounded-md p-4 space-y-2 max-h-48 overflow-y-auto">
-                  {allClasses.map((cls) => (
-                    <div key={cls.id} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={`class-${cls.id}`}
-                        checked={selectedClasses.includes(cls.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedClasses([...selectedClasses, cls.id]);
-                          } else {
-                            setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
-                          }
-                        }}
-                        className="rounded"
+                  {campaignType === 'multiplier' && (
+                    <div>
+                      <Label htmlFor="multiplier">Multiplier Value</Label>
+                      <Input
+                        id="multiplier"
+                        type="number"
+                        step="0.1"
+                        min="1"
+                        max="5"
+                        value={multiplierValue}
+                        onChange={(e) => setMultiplierValue(e.target.value)}
+                        data-guide="campaign-multiplier-input"
                       />
-                      <label htmlFor={`class-${cls.id}`} className="text-sm cursor-pointer">
-                        {cls.name}
-                      </label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Students will earn {multiplierValue}x points while this campaign is active
+                      </p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
 
-              <Button onClick={handleSaveCampaign} className="w-full" data-guide="create-campaign-submit">
-                {editingCampaign ? 'Update Campaign' : 'Create Campaign'}
-              </Button>
+                  {campaignType === 'set_points' && (
+                    <div>
+                      <Label htmlFor="points">Points Reward</Label>
+                      <Input
+                        id="points"
+                        type="number"
+                        min="1"
+                        value={pointsValue}
+                        onChange={(e) => setPointsValue(e.target.value)}
+                        data-guide="campaign-points-input"
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Students will receive {pointsValue} points when confirmed
+                      </p>
+                    </div>
+                  )}
+
+                  {campaignType === 'multiplier' && (
+                    <div>
+                      <Label htmlFor="durationType">Multiplier Duration</Label>
+                      <Select value={durationType} onValueChange={(value: any) => setDurationType(value)}>
+                        <SelectTrigger data-guide="campaign-duration">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="2_minutes">2 Minutes (Test)</SelectItem>
+                          <SelectItem value="1_week">1 Week</SelectItem>
+                          <SelectItem value="1_month">1 Month</SelectItem>
+                          <SelectItem value="1_year">1 Year</SelectItem>
+                          <SelectItem value="custom">Custom</SelectItem>
+                          <SelectItem value="unlimited">Unlimited</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {campaignType === 'multiplier' && durationType === 'custom' && (
+                    <div>
+                      <Label htmlFor="customDurationDays">Duration (Days)</Label>
+                      <Input
+                        id="customDurationDays"
+                        type="number"
+                        min="1"
+                        value={customDurationDays}
+                        onChange={(e) => setCustomDurationDays(e.target.value)}
+                        placeholder="30"
+                        data-guide="campaign-duration"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setCampaignStep(1)}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button 
+                      onClick={() => setCampaignStep(3)}
+                      className="flex-1"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {/* STEP 3: Schedule, Classes & Image */}
+              {campaignStep === 3 && (
+                <>
+                  <div>
+                    <Label htmlFor="image">Campaign Image (Optional)</Label>
+                    <Input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                      data-guide="campaign-image"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="available-from">Available From (Optional)</Label>
+                    <Input
+                      id="available-from"
+                      type="datetime-local"
+                      value={availableFrom}
+                      onChange={(e) => setAvailableFrom(e.target.value)}
+                      data-guide="campaign-availability"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="available-until">Available Until (Optional)</Label>
+                    <Input
+                      id="available-until"
+                      type="datetime-local"
+                      value={availableUntil}
+                      onChange={(e) => setAvailableUntil(e.target.value)}
+                      data-guide="campaign-availability"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="participation-limit">Participation Limit</Label>
+                    <Select value={participationLimit} onValueChange={(v: "once" | "unlimited" | "custom") => setParticipationLimit(v)}>
+                      <SelectTrigger data-guide="campaign-max-participations">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="once">Once per student</SelectItem>
+                        <SelectItem value="unlimited">Unlimited</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {participationLimit === 'custom' && (
+                    <div>
+                      <Label htmlFor="custom-limit">Maximum Participations</Label>
+                      <Input
+                        id="custom-limit"
+                        type="number"
+                        min="1"
+                        value={customParticipationLimit}
+                        onChange={(e) => setCustomParticipationLimit(e.target.value)}
+                        placeholder="3"
+                        data-guide="campaign-max-participations"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Label>Post to Classes</Label>
+                    <div className="border rounded-md p-4 space-y-2 max-h-48 overflow-y-auto">
+                      {allClasses.map((cls) => (
+                        <div key={cls.id} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`class-${cls.id}`}
+                            checked={selectedClasses.includes(cls.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedClasses([...selectedClasses, cls.id]);
+                              } else {
+                                setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
+                              }
+                            }}
+                            className="rounded"
+                          />
+                          <label htmlFor={`class-${cls.id}`} className="text-sm cursor-pointer">
+                            {cls.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setCampaignStep(2)}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button 
+                      onClick={handleSaveCampaign} 
+                      className="flex-1"
+                      data-guide="create-campaign-submit"
+                    >
+                      {editingCampaign ? 'Update Campaign' : 'Create Campaign'}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </DialogContent>
         </Dialog>
