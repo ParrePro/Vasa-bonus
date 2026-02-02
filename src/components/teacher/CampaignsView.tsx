@@ -51,6 +51,9 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
   const [availableUntil, setAvailableUntil] = useState("");
   const [participationLimit, setParticipationLimit] = useState<"once" | "unlimited" | "custom">("unlimited");
   const [customParticipationLimit, setCustomParticipationLimit] = useState("3");
+  const [allTeachers, setAllTeachers] = useState<Array<{ id: string; name: string; email: string }>>([]);
+  const [selectedTeachers, setSelectedTeachers] = useState<Set<string>>(new Set());
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
   const guideButtonClickedRef = useRef(false);
 
   const { toast } = useToast();
@@ -70,6 +73,35 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
       window.removeEventListener('guide-button-clicked', handleGuideButtonClick);
     };
   }, []);
+
+  // Load teachers from selected classes
+  useEffect(() => {
+    const loadTeachers = async () => {
+      if (!selectedClasses.length || editingCampaign) return;
+      
+      try {
+        setLoadingTeachers(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: session } = await supabase.auth.getSession();
+        const accessToken = session?.access_token;
+        if (!accessToken) return;
+
+        const { getTeachersFromClasses } = await import("../../lib/teacher-selection");
+        const teachers = await getTeachersFromClasses(selectedClasses, accessToken);
+        setAllTeachers(teachers);
+        // Pre-select all teachers by default
+        setSelectedTeachers(new Set(teachers.map(t => t.id)));
+      } catch (error) {
+        console.error("Error loading teachers:", error);
+      } finally {
+        setLoadingTeachers(false);
+      }
+    };
+
+    loadTeachers();
+  }, [selectedClasses, editingCampaign]);
 
   const loadAllClasses = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -157,6 +189,8 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
     setAvailableUntil("");
     setParticipationLimit("unlimited");
     setCustomParticipationLimit("3");
+    setAllTeachers([]);
+    setSelectedTeachers(new Set());
     setEditingCampaign(null);
   };
 
@@ -176,6 +210,12 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
         description: "Please select at least one class",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check that at least one teacher is selected if creating a new campaign
+    if (!editingCampaign && selectedTeachers.size === 0) {
+      toast({ title: "Please select at least one teacher who can accept this campaign", variant: "destructive" });
       return;
     }
 
@@ -277,6 +317,21 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
           class_id: cid
         }));
         await supabase.from('campaign_classes').insert(classInserts);
+
+        // Save selected teachers to campaign_teachers table
+        if (selectedTeachers.size > 0) {
+          const campaignTeacherEntries = Array.from(selectedTeachers).map(teacherId => ({
+            campaign_id: insertedData.id,
+            teacher_id: teacherId,
+          }));
+
+          const { error: teacherLinkError } = await supabase.from("campaign_teachers").insert(campaignTeacherEntries);
+
+          if (teacherLinkError) {
+            console.error("Error linking teachers to campaign:", teacherLinkError);
+            toast({ title: "Warning: Could not link all teachers to campaign", description: teacherLinkError.message, variant: "default" });
+          }
+        }
       }
     }
 
@@ -595,6 +650,46 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   ))}
                 </div>
               </div>
+
+              {!editingCampaign && selectedClasses.length > 0 && (
+                <div>
+                  <Label>Teachers Who Can Accept This Campaign *</Label>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Teachers from the selected classes:
+                  </div>
+                  {loadingTeachers ? (
+                    <div className="text-sm text-gray-500">Loading teachers...</div>
+                  ) : allTeachers.length > 0 ? (
+                    <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                      {allTeachers.map((teacher) => (
+                        <div key={teacher.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`teacher-${teacher.id}`}
+                            checked={selectedTeachers.has(teacher.id)}
+                            onCheckedChange={(checked) => {
+                              const newSelected = new Set(selectedTeachers);
+                              if (checked) {
+                                newSelected.add(teacher.id);
+                              } else {
+                                newSelected.delete(teacher.id);
+                              }
+                              setSelectedTeachers(newSelected);
+                            }}
+                          />
+                          <label
+                            htmlFor={`teacher-${teacher.id}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {teacher.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500">No teachers found in selected classes.</div>
+                  )}
+                </div>
+              )}
 
               <Button onClick={handleSaveCampaign} className="w-full" data-guide="create-campaign-submit">
                 {editingCampaign ? 'Update Campaign' : 'Create Campaign'}

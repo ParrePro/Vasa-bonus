@@ -98,15 +98,18 @@ router.post('/purchase-reward', authMiddleware, async (req: AuthRequest, res) =>
 
     // Get teachers in this class who have permission to fulfill rewards
     // Mentors always have permission, co-teachers need can_fulfill_rewards = true
+    // Also check reward_teachers table to ensure only selected teachers receive notifications
     const teachersResult = await query(
-      `SELECT cm.user_id, au.email, cm.receive_email_notifications
+      `SELECT DISTINCT cm.user_id, au.email, cm.receive_email_notifications
        FROM class_members cm 
        JOIN auth_users au ON au.id = cm.user_id 
        JOIN classes c ON c.id = cm.class_id
+       LEFT JOIN reward_teachers rt ON rt.teacher_id = cm.user_id AND rt.reward_id = $2
        WHERE cm.class_id = $1 
          AND cm.is_teacher = true
-         AND (c.mentor_id = cm.user_id OR cm.can_fulfill_rewards = true)`,
-      [classId]
+         AND (c.mentor_id = cm.user_id OR cm.can_fulfill_rewards = true)
+         AND rt.teacher_id IS NOT NULL`,
+      [classId, rewardId]
     );
 
     // Create a message for each teacher with permission and send email
@@ -202,15 +205,18 @@ router.post('/join-campaign', authMiddleware, async (req: AuthRequest, res) => {
 
     // Get teachers in this class who have permission to fulfill campaigns
     // Mentors always have permission, co-teachers need can_fulfill_campaigns = true
+    // Also check campaign_teachers table to ensure only selected teachers receive notifications
     const teachersResult = await query(
-      `SELECT cm.user_id, au.email, cm.receive_email_notifications
+      `SELECT DISTINCT cm.user_id, au.email, cm.receive_email_notifications
        FROM class_members cm 
        JOIN auth_users au ON au.id = cm.user_id 
        JOIN classes c ON c.id = cm.class_id
+       LEFT JOIN campaign_teachers ct ON ct.teacher_id = cm.user_id AND ct.campaign_id = $2
        WHERE cm.class_id = $1 
          AND cm.is_teacher = true
-         AND (c.mentor_id = cm.user_id OR cm.can_fulfill_campaigns = true)`,
-      [classId]
+         AND (c.mentor_id = cm.user_id OR cm.can_fulfill_campaigns = true)
+         AND ct.teacher_id IS NOT NULL`,
+      [classId, campaignId]
     );
 
     // Create a message for each teacher with permission and send email
