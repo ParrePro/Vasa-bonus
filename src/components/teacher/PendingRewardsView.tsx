@@ -14,6 +14,17 @@ interface PendingRewardsViewProps {
 
 const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingRewardsViewProps) => {
   const [pendingRewards, setPendingRewards] = useState<any[]>([]);
+  const [currentTeacherId, setCurrentTeacherId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCurrentTeacher = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentTeacherId(user.id);
+      }
+    };
+    getCurrentTeacher();
+  }, []);
 
   useEffect(() => {
     loadPendingRewards();
@@ -39,9 +50,11 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [classId]);
+  }, [classId, currentTeacherId]);
 
   const loadPendingRewards = async () => {
+    if (!currentTeacherId) return;
+
     const { data: purchases, error } = await supabase
       .from("reward_purchases")
       .select("id, reward_id, student_id, class_id, status, purchased_at")
@@ -60,14 +73,30 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
       return;
     }
 
+    // Filter purchases: only show rewards where current teacher is in reward_teachers table
     const rewardIds = [...new Set(purchases.map((p) => p.reward_id))];
-    const studentIds = [...new Set(purchases.map((p) => p.student_id))];
+    const { data: rewardTeachers } = await supabase
+      .from("reward_teachers")
+      .select("reward_id")
+      .eq("teacher_id", currentTeacherId)
+      .in("reward_id", rewardIds);
+
+    const authorizedRewardIds = new Set((rewardTeachers || []).map(rt => rt.reward_id));
+    const filteredPurchases = purchases.filter(p => authorizedRewardIds.has(p.reward_id));
+
+    if (filteredPurchases.length === 0) {
+      setPendingRewards([]);
+      return;
+    }
+
+    const filteredRewardIds = [...new Set(filteredPurchases.map((p) => p.reward_id))];
+    const studentIds = [...new Set(filteredPurchases.map((p) => p.student_id))];
 
     const [{ data: rewards }, { data: profiles }, { data: classData }] = await Promise.all([
       supabase
         .from("rewards")
         .select("id, title, category, image_url")
-        .in("id", rewardIds),
+        .in("id", filteredRewardIds),
       supabase
         .from("profiles")
         .select("id, name")
@@ -89,7 +118,7 @@ const PendingRewardsView = ({ classId, canFulfillRewards = true }: PendingReward
       return acc;
     }, {} as Record<string, string>);
 
-    const combined = purchases.map((p: any) => ({
+    const combined = filteredPurchases.map((p: any) => ({
       ...p,
       reward: rewardMap[p.reward_id],
       studentName: profileMap[p.student_id] || "Unknown Student",

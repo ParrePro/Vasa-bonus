@@ -36,7 +36,18 @@ interface PendingParticipation {
 
 const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCampaignsViewProps) => {
   const [pendingParticipations, setPendingParticipations] = useState<PendingParticipation[]>([]);
+  const [currentTeacherId, setCurrentTeacherId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getCurrentTeacher = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentTeacherId(user.id);
+      }
+    };
+    getCurrentTeacher();
+  }, []);
 
   useEffect(() => {
     loadPendingParticipations();
@@ -55,9 +66,11 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [classId]);
+  }, [classId, currentTeacherId]);
 
   const loadPendingParticipations = async () => {
+    if (!currentTeacherId) return;
+
     const { data, error } = await supabase
       .from('campaign_participations')
       .select(`
@@ -81,12 +94,28 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
       return;
     }
 
-    // Fetch related data separately
+    // Filter participations: only show campaigns where current teacher is in campaign_teachers table
     const campaignIds = [...new Set(data.map(p => p.campaign_id))];
-    const studentIds = [...new Set(data.map(p => p.student_id))];
+    const { data: campaignTeachers } = await supabase
+      .from("campaign_teachers")
+      .select("campaign_id")
+      .eq("teacher_id", currentTeacherId)
+      .in("campaign_id", campaignIds);
+
+    const authorizedCampaignIds = new Set((campaignTeachers || []).map(ct => ct.campaign_id));
+    const filteredData = data.filter(p => authorizedCampaignIds.has(p.campaign_id));
+
+    if (filteredData.length === 0) {
+      setPendingParticipations([]);
+      return;
+    }
+
+    // Fetch related data separately
+    const filteredCampaignIds = [...new Set(filteredData.map(p => p.campaign_id))];
+    const studentIds = [...new Set(filteredData.map(p => p.student_id))];
 
     const [campaignsData, studentsData, classData] = await Promise.all([
-      supabase.from('campaigns').select('id, title, description, campaign_type, multiplier_value, points_value, duration_type, duration_days').in('id', campaignIds),
+      supabase.from('campaigns').select('id, title, description, campaign_type, multiplier_value, points_value, duration_type, duration_days').in('id', filteredCampaignIds),
       supabase.from('profiles').select('id, name').in('id', studentIds),
       supabase.from('classes').select('id, name').eq('id', classId).single()
     ]);
@@ -101,7 +130,7 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
     const studentsMap = new Map(studentsData.data?.map(s => [s.id, s]) || []);
 
     // Transform the data
-    const transformedData = data.map(item => {
+    const transformedData = filteredData.map(item => {
       const campaign = campaignsMap.get(item.campaign_id);
       const student = studentsMap.get(item.student_id);
       
