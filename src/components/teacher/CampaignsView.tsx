@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
   useEffect(() => {
     loadCampaigns();
     loadAllClasses();
-  }, [classId]);
+  }, [loadCampaigns, loadAllClasses]);
 
   // Listen for guide button click events
   useEffect(() => {
@@ -96,64 +96,68 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
     loadTeachers();
   }, [selectedClasses, editingCampaign]);
 
-  const loadAllClasses = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const loadAllClasses = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    // Check if user is developer
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'developer')
-      .single();
+      // Check if user is developer
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'developer')
+        .single();
 
-    if (roleData) {
-      // Developers can see all classes
-      const { data: allClasses, error: classesError } = await supabase
-        .from('classes')
-        .select('id, name');
+      if (roleData) {
+        // Developers can see all classes
+        const { data: allClasses, error: classesError } = await supabase
+          .from('classes')
+          .select('id, name');
 
-      if (classesError) {
-        console.error('Error loading classes for developer:', classesError);
+        if (classesError) {
+          console.error('Error loading classes for developer:', classesError);
+        }
+
+        setAllClasses(allClasses || []);
+        return;
       }
 
-      setAllClasses(allClasses || []);
-      return;
-    }
-
-    // Get classes where user is mentor
-    const { data: mentorClasses } = await supabase
-      .from('classes')
-      .select('id, name')
-      .eq('mentor_id', user.id);
-
-    // Get classes where user is a teacher
-    const { data: teacherMemberships } = await supabase
-      .from('class_members')
-      .select('class_id')
-      .eq('user_id', user.id)
-      .eq('is_teacher', true);
-
-    if (teacherMemberships && teacherMemberships.length > 0) {
-      const teacherClassIds = teacherMemberships.map(m => m.class_id);
-      const { data: teacherClasses } = await supabase
+      // Get classes where user is mentor
+      const { data: mentorClasses } = await supabase
         .from('classes')
         .select('id, name')
-        .in('id', teacherClassIds);
+        .eq('mentor_id', user.id);
 
-      // Combine and deduplicate
-      const allClassesMap = new Map();
-      [...(mentorClasses || []), ...(teacherClasses || [])].forEach(cls => {
-        allClassesMap.set(cls.id, cls);
-      });
-      setAllClasses(Array.from(allClassesMap.values()));
-    } else {
-      setAllClasses(mentorClasses || []);
+      // Get classes where user is a teacher
+      const { data: teacherMemberships } = await supabase
+        .from('class_members')
+        .select('class_id')
+        .eq('user_id', user.id)
+        .eq('is_teacher', true);
+
+      if (teacherMemberships && teacherMemberships.length > 0) {
+        const teacherClassIds = teacherMemberships.map(m => m.class_id);
+        const { data: teacherClasses } = await supabase
+          .from('classes')
+          .select('id, name')
+          .in('id', teacherClassIds);
+
+        // Combine and deduplicate
+        const allClassesMap = new Map();
+        [...(mentorClasses || []), ...(teacherClasses || [])].forEach(cls => {
+          allClassesMap.set(cls.id, cls);
+        });
+        setAllClasses(Array.from(allClassesMap.values()));
+      } else {
+        setAllClasses(mentorClasses || []);
+      }
+    } catch (error) {
+      console.error('Error loading classes:', error);
     }
-  };
+  }, []);
 
-  const loadCampaigns = async () => {
+  const loadCampaigns = useCallback(async () => {
     const { data, error } = await supabase
       .from('campaigns')
       .select('*')
@@ -166,7 +170,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
     }
 
     setCampaigns((data || []) as Campaign[]);
-  };
+  }, [classId]);
 
   const resetForm = () => {
     setTitle("");

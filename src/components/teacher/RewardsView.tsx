@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/local-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +49,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
   useEffect(() => {
     loadRewards();
     loadClasses();
-  }, [classId]);
+  }, [loadRewards, loadClasses]);
 
   // Listen for guide button click events
   useEffect(() => {
@@ -128,7 +128,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     loadTeachers();
   }, [selectedClasses, editingReward]);
 
-  const loadRewards = async () => {
+  const loadRewards = useCallback(async () => {
     try {
       const { data: rewardClassData, error: rcError } = await supabase
         .from("reward_classes")
@@ -161,9 +161,9 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     } catch (error) {
       console.error("Error in loadRewards:", error);
     }
-  };
+  }, [classId]);
 
-  const loadClasses = async () => {
+  const loadClasses = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -231,7 +231,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     } catch (error) {
       console.error("Error in loadClasses:", error);
     }
-  };
+  }, [classId]);
 
   const handleSaveReward = async () => {
     if (!title || !pointsCost || selectedClasses.length === 0 || !selectedClasses[0]) {
