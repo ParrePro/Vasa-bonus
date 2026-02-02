@@ -239,12 +239,6 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
       return;
     }
 
-    // Check that at least one teacher is selected if creating a new reward
-    if (!editingReward && selectedTeachers.size === 0) {
-      toast({ title: "Please select at least one teacher who can accept this reward", variant: "destructive" });
-      return;
-    }
-
     // Validate duration for recurring rewards
     if (rewardType === "recurring" && !durationType) {
       toast({ title: "Please select a duration for long term rewards", variant: "destructive" });
@@ -500,14 +494,10 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
         <h2 className="text-2xl font-bold">Manage Rewards</h2>
         {canAddRewards && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Don't close if the click originated from a guide button
-            if (!open && guideButtonClickedRef.current) {
-              guideButtonClickedRef.current = false;
-              return;
-            }
-            // Always allow opening
-            if (open) {
-              setDialogOpen(true);
+            setDialogOpen(open);
+            // Reset form when dialog closes
+            if (!open) {
+              resetForm();
             }
           }}>
             <DialogTrigger asChild>
@@ -807,9 +797,9 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
 
               {!editingReward && selectedClasses.length > 0 && (
                 <div>
-                  <Label>Teachers Who Can Accept This Reward *</Label>
+                  <Label>Teachers Who Can Accept This Reward (Optional)</Label>
                   <div className="text-sm text-gray-600 mb-3">
-                    Teachers from the selected classes:
+                    Teachers from the selected classes (leave empty for developers only):
                   </div>
                   {loadingTeachers ? (
                     <div className="text-sm text-gray-500">Loading teachers...</div>

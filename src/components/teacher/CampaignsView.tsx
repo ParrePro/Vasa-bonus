@@ -206,12 +206,6 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
       return;
     }
 
-    // Check that at least one teacher is selected if creating a new campaign
-    if (!editingCampaign && selectedTeachers.size === 0) {
-      toast({ title: "Please select at least one teacher who can accept this campaign", variant: "destructive" });
-      return;
-    }
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -646,9 +640,9 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
 
               {!editingCampaign && selectedClasses.length > 0 && (
                 <div>
-                  <Label>Teachers Who Can Accept This Campaign *</Label>
+                  <Label>Teachers Who Can Accept This Campaign (Optional)</Label>
                   <div className="text-sm text-gray-600 mb-3">
-                    Teachers from the selected classes:
+                    Teachers from the selected classes (leave empty for developers only):
                   </div>
                   {loadingTeachers ? (
                     <div className="text-sm text-gray-500">Loading teachers...</div>
