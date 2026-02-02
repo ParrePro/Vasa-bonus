@@ -5,6 +5,7 @@ export interface TeacherOption {
   id: string;
   name: string;
   email: string;
+  role?: string; // 'developer', 'teacher', etc.
 }
 
 /**

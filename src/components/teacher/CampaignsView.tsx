@@ -653,31 +653,72 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                   {loadingTeachers ? (
                     <div className="text-sm text-gray-500">Loading teachers...</div>
                   ) : allTeachers.length > 0 ? (
-                    <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
-                      {allTeachers.map((teacher) => (
-                        <div key={teacher.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`teacher-${teacher.id}`}
-                            checked={selectedTeachers.has(teacher.id)}
-                            onCheckedChange={(checked) => {
-                              const newSelected = new Set(selectedTeachers);
-                              if (checked) {
-                                newSelected.add(teacher.id);
-                              } else {
-                                newSelected.delete(teacher.id);
-                              }
-                              setSelectedTeachers(newSelected);
-                            }}
-                          />
-                          <label
-                            htmlFor={`teacher-${teacher.id}`}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                          >
-                            {teacher.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
+                    <>
+                      <div className="flex gap-2 mb-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const developerIds = new Set(
+                              allTeachers
+                                .filter(t => t.role === 'developer')
+                                .map(t => t.id)
+                            );
+                            setSelectedTeachers(developerIds);
+                          }}
+                          className="flex-1"
+                        >
+                          Developers Only
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedTeachers(new Set(allTeachers.map(t => t.id)))}
+                          className="flex-1"
+                        >
+                          Select All
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedTeachers(new Set())}
+                          className="flex-1"
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                      <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                        {allTeachers.map((teacher) => (
+                          <div key={teacher.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`teacher-${teacher.id}`}
+                              checked={selectedTeachers.has(teacher.id)}
+                              onCheckedChange={(checked) => {
+                                const newSelected = new Set(selectedTeachers);
+                                if (checked) {
+                                  newSelected.add(teacher.id);
+                                } else {
+                                  newSelected.delete(teacher.id);
+                                }
+                                setSelectedTeachers(newSelected);
+                              }}
+                            />
+                            <label
+                              htmlFor={`teacher-${teacher.id}`}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                            >
+                              {teacher.name}
+                              {teacher.role === 'developer' && (
+                                <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Developer</span>
+                              )}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   ) : (
                     <div className="text-sm text-gray-500">No teachers found in selected classes.</div>
                   )}

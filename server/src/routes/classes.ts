@@ -332,16 +332,18 @@ router.post('/get-teachers', authMiddleware, async (req: AuthRequest, res) => {
       return res.status(400).json({ error: 'classIds array is required' });
     }
 
-    // Get unique teachers from the specified classes
+    // Get unique teachers from the specified classes with their roles
     const placeholders = classIds.map((_, i) => `$${i + 1}`).join(',');
     const result = await query(
       `SELECT DISTINCT 
         cm.user_id,
         p.name,
-        au.email
+        au.email,
+        ur.role
        FROM class_members cm
        JOIN profiles p ON cm.user_id = p.id
        JOIN auth_users au ON cm.user_id = au.id
+       LEFT JOIN user_roles ur ON cm.user_id = ur.user_id
        WHERE cm.class_id IN (${placeholders}) 
          AND cm.is_teacher = true
        ORDER BY p.name ASC`,
@@ -352,6 +354,7 @@ router.post('/get-teachers', authMiddleware, async (req: AuthRequest, res) => {
       id: row.user_id,
       name: row.name,
       email: row.email,
+      role: row.role || 'teacher',
     }));
 
     res.json(teachers);
