@@ -183,7 +183,16 @@ const TeacherClassView = () => {
       .order("points", { ascending: false });
 
     if (data) {
-      setDefaultReasons(data);
+      // Deduplicate by reason text - keep first occurrence only
+      const seen = new Set<string>();
+      const uniqueReasons = data.filter((reason) => {
+        if (seen.has(reason.reason)) {
+          return false;
+        }
+        seen.add(reason.reason);
+        return true;
+      });
+      setDefaultReasons(uniqueReasons);
     }
   };
 
