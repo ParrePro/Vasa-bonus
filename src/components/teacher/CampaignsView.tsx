@@ -384,11 +384,15 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
         <h2 className="text-2xl font-bold">Campaigns</h2>
         {canAddCampaigns && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Don't close if guide button triggered this
-            if (!open && guideButtonClickedRef.current) {
-              guideButtonClickedRef.current = false;
-              return;
+            // Prevent closing when smart guide overlay is active
+            if (!open) {
+              // Check if guide overlay exists (it renders as a Card with z-[9999] and has data-guide-button)
+              const hasGuideOpen = document.querySelector('[class*="z-9999"]') !== null;
+              if (hasGuideOpen) {
+                return; // Don't close if guide is open
+              }
             }
+            
             setDialogOpen(open);
             if (!open) resetForm();
           }}>
