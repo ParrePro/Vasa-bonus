@@ -184,6 +184,7 @@ const SmartGuideOverlay = ({
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
     // Dispatch event to notify components that guide button was clicked
     window.dispatchEvent(new CustomEvent('guide-button-clicked'));
     handleNext();
@@ -227,6 +228,10 @@ const SmartGuideOverlay = ({
           left: `${position.x}px`,
           top: `${position.y}px`,
           userSelect: isDragging ? "none" : "auto",
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.nativeEvent.stopImmediatePropagation();
         }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
