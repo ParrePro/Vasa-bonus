@@ -11,9 +11,17 @@ export interface TeacherOption {
  * Get unique teachers from selected classes
  * Used when creating rewards/campaigns to select which teachers can fulfill them
  */
-export async function getTeachersFromClasses(classIds: string[], accessToken: string): Promise<TeacherOption[]> {
+export async function getTeachersFromClasses(classIds: string[], accessToken?: string): Promise<TeacherOption[]> {
   try {
     console.log('Fetching teachers for class IDs:', classIds);
+
+    // Get token from localStorage if not provided
+    const token = accessToken || localStorage.getItem('auth_token') || '';
+    
+    if (!token) {
+      console.error('No authentication token available');
+      return [];
+    }
 
     // Call the backend endpoint to get teachers
     const response = await fetch(
@@ -21,7 +29,7 @@ export async function getTeachersFromClasses(classIds: string[], accessToken: st
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken || ''}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ classIds }),

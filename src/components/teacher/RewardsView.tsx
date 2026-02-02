@@ -113,11 +113,8 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
       
       try {
         setLoadingTeachers(true);
-        const { data: session } = await supabase.auth.getSession();
-        const accessToken = session?.access_token || '';
-
         const { getTeachersFromClasses } = await import("../../lib/teacher-selection");
-        const teachers = await getTeachersFromClasses(selectedClasses, accessToken);
+        const teachers = await getTeachersFromClasses(selectedClasses);
         setAllTeachers(teachers);
         // Pre-select all teachers by default
         setSelectedTeachers(new Set(teachers.map(t => t.id)));
