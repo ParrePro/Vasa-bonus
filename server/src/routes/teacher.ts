@@ -93,15 +93,20 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
         }
 
         // Update the email notification preference
-        await query(
+        const updateResult = await query(
           `UPDATE class_members 
            SET receive_email_notifications = $1 
            WHERE user_id = $2 AND class_id = $3`,
           [notificationStatus, userId, classId]
         );
         
-        updateCount++;
-        console.log(`Updated class ${classId} for user ${userId}`);
+        if (updateResult.rowCount && updateResult.rowCount > 0) {
+          updateCount++;
+          console.log(`Updated class ${classId} for user ${userId}`);
+        } else {
+          console.warn(`No rows updated for class ${classId} for user ${userId}`);
+          errors.push(`No rows updated for class ${classId}`);
+        }
       } catch (loopError: any) {
         const errorMsg = `Error updating class: ${loopError.message}`;
         console.error(errorMsg);
@@ -109,8 +114,13 @@ router.post('/email-settings', authMiddleware, async (req: AuthRequest, res) => 
       }
     }
 
-    if (updateCount === 0 && errors.length > 0) {
-      return res.status(400).json({ error: 'Failed to update settings', details: errors });
+    if (updateCount === 0) {
+      // Check if we have errors to report
+      if (errors.length > 0) {
+        return res.status(400).json({ error: 'Failed to update settings', details: errors });
+      }
+      // If no updates and no errors, it means all settings were skipped during verification
+      return res.status(400).json({ error: 'No classes found or user is not a teacher in any provided classes' });
     }
 
     res.json({ 

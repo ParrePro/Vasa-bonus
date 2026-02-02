@@ -32,10 +32,13 @@ createuser -h $DB_HOST -p $DB_PORT $DB_USER 2>/dev/null || echo "User may alread
 
 # Run migrations
 echo "Running migrations..."
-PGPASSWORD=$DB_PASSWORD psql -U $DB_USER -h $DB_HOST -p $DB_PORT -d $DB_NAME -f server/migrations/001_init.sql 2>/dev/null || {
-    echo "Trying with default authentication..."
-    psql -h $DB_HOST -p $DB_PORT -d $DB_NAME -f server/migrations/001_init.sql
-}
+for migration in server/migrations/*.sql; do
+  echo "Running migration: $migration"
+  PGPASSWORD=$DB_PASSWORD psql -U $DB_USER -h $DB_HOST -p $DB_PORT -d $DB_NAME -f "$migration" 2>/dev/null || {
+    echo "Trying with default authentication for: $migration"
+    psql -h $DB_HOST -p $DB_PORT -d $DB_NAME -f "$migration"
+  }
+done
 
 echo ""
 echo "✅ Database setup complete!"
