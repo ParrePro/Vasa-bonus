@@ -384,13 +384,13 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
         <h2 className="text-2xl font-bold">Campaigns</h2>
         {canAddCampaigns && (
           <Dialog open={dialogOpen} onOpenChange={(open) => {
-            // Only allow closing, never auto-close on outside clicks
-            // Dialog will only close via the X button
-            if (open === false) {
-              // Ignore all close attempts - only the close button can close this
-              return;
+            if (!open) {
+              // Allow closing - reset form when dialog closes
+              setDialogOpen(false);
+              resetForm();
+            } else {
+              setDialogOpen(open);
             }
-            setDialogOpen(open);
           }}>
             <DialogTrigger asChild>
               <Button data-guide="add-campaign-button">
@@ -401,29 +401,6 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>{editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}</DialogTitle>
-              <button
-                onClick={() => {
-                  setDialogOpen(false);
-                  resetForm();
-                }}
-                className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
-                >
-                  <path d="M18 6l-12 12M6 6l12 12"></path>
-                </svg>
-                <span className="sr-only">Close</span>
-              </button>
             </DialogHeader>
             <div className="space-y-4">
               <div>
