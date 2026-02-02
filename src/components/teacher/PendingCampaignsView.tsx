@@ -94,16 +94,33 @@ const PendingCampaignsView = ({ classId, canFulfillCampaigns = true }: PendingCa
       return;
     }
 
-    // Filter participations: only show campaigns where current teacher is in campaign_teachers table
+    // Filter participations: show campaigns where current teacher is in campaign_teachers table OR is a developer
     const campaignIds = [...new Set(data.map(p => p.campaign_id))];
-    const { data: campaignTeachers } = await supabase
-      .from("campaign_teachers")
-      .select("campaign_id")
-      .eq("teacher_id", currentTeacherId)
-      .in("campaign_id", campaignIds);
+    
+    // Check if current user is a developer
+    const { data: devRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", currentTeacherId)
+      .eq("role", "developer")
+      .single();
 
-    const authorizedCampaignIds = new Set((campaignTeachers || []).map(ct => ct.campaign_id));
-    const filteredData = data.filter(p => authorizedCampaignIds.has(p.campaign_id));
+    const isDeveloper = !!devRole;
+    
+    let filteredData = data;
+    
+    if (!isDeveloper) {
+      // Teachers can only see campaigns they're explicitly assigned to
+      const { data: campaignTeachers } = await supabase
+        .from("campaign_teachers")
+        .select("campaign_id")
+        .eq("teacher_id", currentTeacherId)
+        .in("campaign_id", campaignIds);
+
+      const authorizedCampaignIds = new Set((campaignTeachers || []).map(ct => ct.campaign_id));
+      filteredData = data.filter(p => authorizedCampaignIds.has(p.campaign_id));
+    }
+    // If developer, show all campaigns
 
     if (filteredData.length === 0) {
       setPendingParticipations([]);
