@@ -127,6 +127,15 @@ export const createRewardSmartGuide: GuideStep[] = [
   },
   {
     id: "step-10",
+    title: "👨‍🏫 Select Teachers (Optional)",
+    instruction:
+      "Choose which teachers can approve or fulfill this reward request. You can:\n\n• Leave empty: Only developers can approve\n• Select specific teachers: Those teachers + developers can approve\n\nYou can edit this anytime later.",
+    waitFor: {
+      type: "custom",
+    },
+  },
+  {
+    id: "step-11",
     title: "🎯 Add to Multiple Classes (Optional)",
     instruction:
       "You can optionally add this same reward to other classes. This saves time if you use the same rewards across multiple classes. Then click 'Create Reward' to finish!",
@@ -136,7 +145,7 @@ export const createRewardSmartGuide: GuideStep[] = [
     },
   },
   {
-    id: "step-11",
+    id: "step-12",
     title: "🎉 Reward Created!",
     instruction:
       "Excellent! Your reward is now live. Students can see it in their rewards catalog and start earning points to redeem it.",
@@ -255,6 +264,15 @@ export const createCampaignSmartGuide: GuideStep[] = [
   },
   {
     id: "step-12",
+    title: "👨‍🏫 Select Teachers (Optional)",
+    instruction:
+      "Choose which teachers can approve or reject student participation in this campaign. You can:\n\n• Leave empty: Only developers can approve/reject\n• Select specific teachers: Those teachers + developers can approve/reject\n\nYou can edit this anytime later.",
+    waitFor: {
+      type: "custom",
+    },
+  },
+  {
+    id: "step-13",
     title: "✅ Create the Campaign",
     instruction:
       "Click 'Create Campaign' to launch your campaign. It will be active immediately and students will see the bonus points when they complete actions.",
@@ -264,7 +282,7 @@ export const createCampaignSmartGuide: GuideStep[] = [
     },
   },
   {
-    id: "step-13",
+    id: "step-14",
     title: "🎯 Campaign Best Practices",
     instruction:
       "💡 Tips: Use multipliers for general motivation (before exams, month-long challenges). Use set points for specific actions (homework, reading). Short campaigns create urgency!",
@@ -273,7 +291,7 @@ export const createCampaignSmartGuide: GuideStep[] = [
     },
   },
   {
-    id: "step-14",
+    id: "step-15",
     title: "🎉 Campaign Live!",
     instruction:
       "Congratulations! Your campaign is now active. Students will earn bonus points based on your campaign type. You can create more campaigns or edit this one.",

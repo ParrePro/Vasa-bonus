@@ -393,6 +393,18 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
       setSelectedClasses([classId]);
     }
 
+    // Load selected teachers for this campaign
+    const { data: campaignTeachersData } = await supabase
+      .from('campaign_teachers')
+      .select('teacher_id')
+      .eq('campaign_id', campaign.id);
+    
+    if (campaignTeachersData && campaignTeachersData.length > 0) {
+      setSelectedTeachers(new Set(campaignTeachersData.map(ct => ct.teacher_id)));
+    } else {
+      setSelectedTeachers(new Set());
+    }
+
     setDialogOpen(true);
   };
 
@@ -638,7 +650,7 @@ const CampaignsView = ({ classId, canAddCampaigns = true }: CampaignsViewProps) 
                 </div>
               </div>
 
-              {!editingCampaign && selectedClasses.length > 0 && (
+              {selectedClasses.length > 0 && (
                 <div>
                   <Label>Teachers Who Can Accept This Campaign (Optional)</Label>
                   <div className="text-sm text-gray-600 mb-3">

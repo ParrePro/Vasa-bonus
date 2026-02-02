@@ -449,7 +449,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
     setSelectedTeachers(new Set());
   };
 
-  const handleEditReward = (reward: any) => {
+  const handleEditReward = async (reward: any) => {
     setEditingReward(reward);
     setTitle(reward.title);
     setDescription(reward.description || "");
@@ -475,6 +475,30 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
       setAvailableFrom(reward.available_from.slice(0, 16));
     } else {
       setScheduleForLater(false);
+    }
+    
+    // Load selected classes for this reward
+    const { data: classesData } = await supabase
+      .from('reward_classes')
+      .select('class_id')
+      .eq('reward_id', reward.id);
+    
+    if (classesData && classesData.length > 0) {
+      setSelectedClasses(classesData.map(rc => rc.class_id));
+    } else {
+      setSelectedClasses([classId]);
+    }
+
+    // Load selected teachers for this reward
+    const { data: rewardTeachersData } = await supabase
+      .from('reward_teachers')
+      .select('teacher_id')
+      .eq('reward_id', reward.id);
+    
+    if (rewardTeachersData && rewardTeachersData.length > 0) {
+      setSelectedTeachers(new Set(rewardTeachersData.map(rt => rt.teacher_id)));
+    } else {
+      setSelectedTeachers(new Set());
     }
     
     setDialogOpen(true);
@@ -795,7 +819,7 @@ const RewardsView = ({ classId, canAddRewards = true }: RewardsViewProps) => {
                 </div>
               )}
 
-              {!editingReward && selectedClasses.length > 0 && (
+              {selectedClasses.length > 0 && (
                 <div>
                   <Label>Teachers Who Can Accept This Reward (Optional)</Label>
                   <div className="text-sm text-gray-600 mb-3">
