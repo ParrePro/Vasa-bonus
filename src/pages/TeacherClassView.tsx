@@ -154,6 +154,7 @@ const TeacherClassView = () => {
         const studentsWithAvatar = (profileData || []).map((p: any) => ({
           id: p.id,
           name: p.name,
+          points: 0, // Will be populated below
           customization: {
             avatar_skin: p.avatar_skin,
             avatar_hair: p.avatar_hair,
@@ -165,6 +166,28 @@ const TeacherClassView = () => {
             avatar_effect: p.avatar_effect,
           }
         }));
+
+        // Fetch points for all students
+        const userIds = profileData?.map((p: any) => p.id) || [];
+        if (userIds.length > 0) {
+          const { data: pointsData } = await supabase
+            .from("points_transactions")
+            .select("student_id, points")
+            .eq("class_id", classId)
+            .in("student_id", userIds);
+
+          // Create a map of student points
+          const pointsMap = new Map<string, number>();
+          pointsData?.forEach((transaction: any) => {
+            const current = pointsMap.get(transaction.student_id) || 0;
+            pointsMap.set(transaction.student_id, current + transaction.points);
+          });
+
+          // Update students with their points
+          studentsWithAvatar.forEach((student: any) => {
+            student.points = pointsMap.get(student.id) || 0;
+          });
+        }
 
         setStudents(studentsWithAvatar);
       } else {
@@ -1056,6 +1079,10 @@ const TeacherClassView = () => {
                           {favorites.has(student.id) && <span className="text-yellow-500">★ Favorite • </span>}
                           Student
                         </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-primary">{student.points || 0}</p>
+                        <p className="text-xs text-muted-foreground">points</p>
                       </div>
                     </div>
                   ))
