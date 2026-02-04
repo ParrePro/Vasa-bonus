@@ -38,7 +38,15 @@ const DefaultPointReasons = () => {
         .order("points", { ascending: false });
 
       if (error) throw error;
-      setReasons(data || []);
+      
+      // Deduplicate by reason text and points
+      const uniqueReasons = Array.from(
+        new Map(
+          (data || []).map(item => [`${item.reason.toLowerCase()}-${item.points}`, item])
+        ).values()
+      ) as PointReason[];
+      
+      setReasons(uniqueReasons);
     } catch (error: any) {
       console.error("Error loading reasons:", error);
       toast({
