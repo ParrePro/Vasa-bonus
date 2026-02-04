@@ -168,7 +168,6 @@ const TeacherClassView = () => {
         }));
 
         // Fetch points for all students
-        const userIds = profileData?.map((p: any) => p.id) || [];
         if (userIds.length > 0) {
           const { data: pointsData } = await supabase
             .from("points_transactions")
