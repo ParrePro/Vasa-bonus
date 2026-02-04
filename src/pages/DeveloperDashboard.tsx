@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTierFavicon } from "@/hooks/use-tier-favicon";
-import { LogOut, Copy, Building2, CheckCircle, Settings } from "lucide-react";
+import { LogOut, Copy, Building2, CheckCircle, Settings, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FulfilledRewardsView from "@/components/teacher/FulfilledRewardsView";
 import AccountSettings from "@/components/AccountSettings";
+import DefaultPointReasons from "@/components/developer/DefaultPointReasons";
 
 const DeveloperDashboard = () => {
   const [userName, setUserName] = useState("");
@@ -162,10 +163,14 @@ const DeveloperDashboard = () => {
 
       <main className="p-6 max-w-6xl mx-auto space-y-6">
         <Tabs defaultValue="schools" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="schools">
               <Building2 className="w-4 h-4 mr-2" />
               Schools
+            </TabsTrigger>
+            <TabsTrigger value="points">
+              <Zap className="w-4 h-4 mr-2" />
+              Point Options
             </TabsTrigger>
             <TabsTrigger value="fulfilled">
               <CheckCircle className="w-4 h-4 mr-2" />
@@ -248,6 +253,10 @@ const DeveloperDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="points" className="mt-6">
+            <DefaultPointReasons />
           </TabsContent>
 
           <TabsContent value="fulfilled" className="mt-6">
