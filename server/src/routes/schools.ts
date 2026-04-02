@@ -224,6 +224,7 @@ router.get('/:schoolId/teacher-leaderboard', authMiddleware, async (req: AuthReq
       JOIN auth_users au ON pt.teacher_id = au.id
       JOIN profiles p ON pt.teacher_id = p.id
       JOIN classes c ON pt.class_id = c.id
+      JOIN user_roles ur ON pt.teacher_id = ur.user_id AND ur.role = 'teacher'
       WHERE c.school_id = $1
       GROUP BY pt.teacher_id, p.name, au.id
       ORDER BY total_points_given DESC`,
