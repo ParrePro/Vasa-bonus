@@ -12,6 +12,7 @@ import CreateClassView from "@/components/teacher/CreateClassView";
 import JoinClassView from "@/components/teacher/JoinClassView";
 import FulfilledRewardsView from "@/components/teacher/FulfilledRewardsView";
 import AccountSettings from "@/components/AccountSettings";
+import CompetitionNotification from "@/components/teacher/CompetitionNotification";
 
 type View = "give-points" | "create-class" | "join-class" | "fulfilled" | "settings";
 
@@ -115,7 +116,12 @@ const TeacherDashboard = () => {
         </header>
 
         <main className="flex-1 overflow-auto p-6">
-          {currentView === "give-points" && <GivePointsView />}
+          {currentView === "give-points" && (
+            <>
+              <CompetitionNotification />
+              <GivePointsView />
+            </>
+          )}
           {currentView === "create-class" && <CreateClassView />}
           {currentView === "join-class" && <JoinClassView />}
           {currentView === "fulfilled" && <FulfilledRewardsView />}
