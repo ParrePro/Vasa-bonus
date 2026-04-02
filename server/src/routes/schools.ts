@@ -208,4 +208,33 @@ router.delete('/:schoolId', authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
+// Get teacher leaderboard for a school (which teachers give the most points)
+router.get('/:schoolId/teacher-leaderboard', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { schoolId } = req.params;
+
+    // Get teacher leaderboard: teachers ranked by total points given in the school
+    const result = await query(
+      `SELECT 
+        pt.teacher_id,
+        p.name as teacher_name,
+        COUNT(pt.id) as total_transactions,
+        SUM(pt.points) as total_points_given
+      FROM points_transactions pt
+      JOIN auth_users au ON pt.teacher_id = au.id
+      JOIN profiles p ON pt.teacher_id = p.id
+      JOIN classes c ON pt.class_id = c.id
+      WHERE c.school_id = $1
+      GROUP BY pt.teacher_id, p.name, au.id
+      ORDER BY total_points_given DESC`,
+      [schoolId]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get teacher leaderboard error:', error);
+    res.status(500).json({ error: 'Failed to get teacher leaderboard' });
+  }
+});
+
 export default router;
