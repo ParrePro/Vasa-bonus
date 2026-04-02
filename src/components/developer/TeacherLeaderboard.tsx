@@ -32,6 +32,7 @@ const TeacherLeaderboard = ({ schoolId }: TeacherLeaderboardProps) => {
         {
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
           },
           credentials: "include",
         }
