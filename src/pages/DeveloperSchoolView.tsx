@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import SchoolStats from "@/components/developer/SchoolStats";
 import StudentSearchDelete from "@/components/developer/StudentSearchDelete";
 import PointsTransfer from "@/components/developer/PointsTransfer";
+import TeacherLeaderboard from "@/components/TeacherLeaderboard";
 
 type View = "classes" | "stats" | "students" | "settings" | "transfer";
 
@@ -485,7 +486,10 @@ const DeveloperSchoolView = () => {
           )}
 
           {currentView === "stats" && (
-            <SchoolStats schoolId={schoolId!} />
+            <div className="space-y-6">
+              <SchoolStats schoolId={schoolId!} />
+              <TeacherLeaderboard schoolId={schoolId!} />
+            </div>
           )}
 
           {currentView === "students" && (
