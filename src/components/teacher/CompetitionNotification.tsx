@@ -12,9 +12,9 @@ const CompetitionNotification = ({ onDismiss }: CompetitionNotificationProps) =>
   const [daysLeft, setDaysLeft] = useState(0);
 
   useEffect(() => {
-    // Calculate days until April 30
+    // Calculate days until April 23
     const today = new Date();
-    const deadline = new Date(2026, 3, 30); // April 30, 2026 (month is 0-indexed)
+    const deadline = new Date(2026, 3, 23); // April 23, 2026 (month is 0-indexed)
     const timeDiff = deadline.getTime() - today.getTime();
     const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
     setDaysLeft(Math.max(0, daysRemaining));
@@ -56,11 +56,11 @@ const CompetitionNotification = ({ onDismiss }: CompetitionNotificationProps) =>
                   <p className="text-lg font-bold text-yellow-900">
                     {daysLeft} days
                   </p>
-                  <p className="text-xs text-yellow-700">Until April 30th</p>
+                  <p className="text-xs text-yellow-700">Until April 23rd</p>
                 </div>
               </div>
               <p className="text-xs text-yellow-700 mt-3">
-                The winner will be announced on April 30th! Check the Developer's School Stats to see the leaderboard.
+                The winner will be announced on April 23rd! Check the Developer's School Stats to see the leaderboard.
               </p>
             </div>
           </div>
